@@ -1,0 +1,16 @@
+import 'package:flutter/material.dart';
+import 'login_screen_ui.dart';
+
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  @override
+  void initState() {}
+  @override
+  Widget build(BuildContext context) {
+    return LoginScreenUI();
+  }
+}
