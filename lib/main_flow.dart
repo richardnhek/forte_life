@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:forte_life/widgets/active_nav_icon.dart';
 import 'screens/home/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_provider.dart';

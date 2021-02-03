@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 
-class AgeField extends StatelessWidget {
-  AgeField({this.formController, this.height});
+class AddedRyder extends StatelessWidget {
+  AddedRyder({this.formController});
 
   final TextEditingController formController;
-  final double height;
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 5),
+      padding: EdgeInsets.only(left: 5),
       child: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.12),
-            border: Border.all(color: Color(0xFFB8B8B8))),
+        decoration: BoxDecoration(border: Border.all(color: Color(0xFFB8B8B8))),
         child: TextFormField(
           readOnly: true,
           textAlignVertical: TextAlignVertical.bottom,
@@ -23,10 +20,10 @@ class AgeField extends StatelessWidget {
               enabledBorder: InputBorder.none,
               border: InputBorder.none,
               focusedBorder: InputBorder.none,
-              contentPadding: EdgeInsets.only(left: 5, top: 10, bottom: 10),
+              contentPadding: EdgeInsets.all(10),
               isDense: true,
-              hintText: "Age",
-              labelText: "Age",
+              hintText: "Added Ryder",
+              labelText: "Added Ryder",
               labelStyle: TextStyle(
                   fontFamily: "Kano",
                   fontSize: 15,

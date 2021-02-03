@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import "package:provider/provider.dart";
 import 'package:flutter/services.dart';
 
 class AppProvider extends ChangeNotifier {
@@ -15,11 +14,31 @@ class AppProvider extends ChangeNotifier {
   //
 
   // LP and P are the same or not
-  bool _differentPerson = true;
-  bool get differentPerson => _differentPerson;
+  bool _samePerson = false;
+  bool get samePerson => _samePerson;
 
-  set differentPerson(bool i) {
-    _differentPerson = i;
+  set samePerson(bool i) {
+    _samePerson = i;
+    notifyListeners();
+  }
+  //
+
+  // Switch between info and calculator
+  int _calculationPage = 0;
+  int get calculationPage => _calculationPage;
+
+  set calculationPage(int i) {
+    _calculationPage = i;
+    notifyListeners();
+  }
+  //
+
+  // Add Ryder
+  bool _addRyder = false;
+  bool get addRyder => _addRyder;
+
+  set addRyder(bool i) {
+    _addRyder = i;
     notifyListeners();
   }
   //

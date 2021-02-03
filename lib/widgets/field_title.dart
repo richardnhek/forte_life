@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 class FieldTitle extends StatelessWidget {
-  FieldTitle({this.fieldTitle});
+  FieldTitle({this.fieldTitle, this.extraPadding});
 
   final String fieldTitle;
+  final double extraPadding;
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 5, right: 5, bottom: 5, top: 15),
+      padding: EdgeInsets.only(left: 5, bottom: 15, top: extraPadding),
       child: Text(
         fieldTitle,
         style: TextStyle(
