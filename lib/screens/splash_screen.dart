@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:forte_life/providers/app_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:path_provider/path_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -47,10 +51,22 @@ class _SplashScreenState extends State<SplashScreen>
     Navigator.pushNamed(context, "/login");
   }
 
+  Future<void> getImageFileFromAssets(String path) async {
+    final byteData = await rootBundle.load(path);
+
+    final file = new File(
+        "/storage/emulated/0/Android/data/com.reahu.forte_life/files/logo.png");
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+  }
+
   void runAppInitialization() async {
     AppProvider appProvider = Provider.of(context, listen: false);
     appProvider.setAppOrientation();
     await Future.delayed(const Duration(milliseconds: 4600));
+    await appProvider.requestPermissions();
+    await getExternalStorageDirectory();
+    await getImageFileFromAssets("assets/pictures/android/logo/logo.png");
     await determineInitialRoute();
   }
 

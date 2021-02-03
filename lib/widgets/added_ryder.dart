@@ -12,6 +12,7 @@ class AddedRyder extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(border: Border.all(color: Color(0xFFB8B8B8))),
         child: TextFormField(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           readOnly: true,
           textAlignVertical: TextAlignVertical.bottom,
           controller: formController,
@@ -38,7 +39,6 @@ class AddedRyder extends StatelessWidget {
             fontSize: 15,
             fontFamily: "Biko",
           ),
-          autovalidateMode: AutovalidateMode.always,
         ),
       ),
     );

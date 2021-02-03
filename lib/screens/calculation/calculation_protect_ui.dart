@@ -103,6 +103,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
           padding: EdgeInsets.symmetric(
               horizontal: 20, vertical: mq.size.height / 9),
           child: Form(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -556,7 +557,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                       padding: EdgeInsets.symmetric(horizontal: 5),
                       child: CalculateButton(
                         onPressed: () {
-                          print("Calculate");
+                          appProvider.activeTabIndex = 1;
+                          Navigator.of(context).pushNamed("/main_flow");
                         },
                       ),
                     ),
@@ -630,6 +632,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
     return age.toString();
   }
   //
+
+  //Check
 
   //Validate age limitations
   bool checkAgeLimit(int pYear, int age) {

@@ -1,0 +1,48 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+
+class PDFScreenProtectUI extends StatefulWidget {
+  @override
+  _PDFScreenProtectUIState createState() => _PDFScreenProtectUIState();
+}
+
+class _PDFScreenProtectUIState extends State<PDFScreenProtectUI> {
+  File file = File(
+      "/storage/emulated/0/Android/data/com.reahu.forte_life/files/fortelife.pdf");
+  bool _isLoading = true;
+  @override
+  void initState() {
+    super.initState();
+    showPDF();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Center(
+          child: _isLoading == true
+              ? Center(child: CircularProgressIndicator())
+              : SafeArea(
+                  child: SfPdfViewer.file(
+                    file,
+                    pageSpacing: 0,
+                  ),
+                )),
+    );
+  }
+
+  Future showPDF() async {
+    await Future.delayed(const Duration(milliseconds: 2000));
+    getPDF();
+  }
+
+  Future getPDF() async {
+    file = File(
+        "/storage/emulated/0/Android/data/com.reahu.forte_life/files/fortelife.pdf");
+    setState(() {
+      _isLoading = false;
+    });
+  }
+}

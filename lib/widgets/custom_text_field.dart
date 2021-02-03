@@ -31,6 +31,7 @@ class CustomTextField extends StatelessWidget {
             decoration:
                 BoxDecoration(border: Border.all(color: Color(0xFFB8B8B8))),
             child: TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               maxLines: 1,
               onChanged: onChange,
               textAlignVertical: TextAlignVertical.bottom,
@@ -58,7 +59,6 @@ class CustomTextField extends StatelessWidget {
                 fontSize: 15,
                 fontFamily: "Kano",
               ),
-              autovalidateMode: AutovalidateMode.always,
             ),
           ),
         ],

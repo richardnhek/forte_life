@@ -15,11 +15,7 @@ class HomeScreenUI extends StatelessWidget {
         children: [
           Container(
             width: double.infinity,
-            height: DeviceUtils.getResponsive(
-                appProvider: appProvider,
-                mq: mq,
-                onPhone: mq.size.height / 3,
-                onTablet: mq.size.height / 3),
+            height: mq.size.height / 3,
             decoration: BoxDecoration(
                 image: DecorationImage(
                     image: AssetImage("assets/pictures/android/gradient3.png"),
@@ -32,13 +28,7 @@ class HomeScreenUI extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(
-                      top: DeviceUtils.getResponsive(
-                          appProvider: appProvider,
-                          mq: mq,
-                          onPhone: mq.size.height / 8,
-                          onTablet: mq.size.height / 8),
-                      left: 15),
+                  padding: EdgeInsets.only(top: mq.size.height / 8, left: 15),
                   child: Container(
                     width: 180,
                     height: 35,
@@ -52,11 +42,7 @@ class HomeScreenUI extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                    top: DeviceUtils.getResponsive(
-                        appProvider: appProvider,
-                        mq: mq,
-                        onPhone: mq.size.height / 6,
-                        onTablet: mq.size.height / 6),
+                    top: mq.size.height / 6,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
