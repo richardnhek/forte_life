@@ -66,8 +66,8 @@ class _MainFlowState extends State<MainFlow> {
               label: 'Information',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.call_outlined),
-              label: "Contact",
+              icon: Icon(Icons.person_outline_rounded),
+              label: "Profile",
             ),
           ],
         ),

@@ -319,7 +319,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                 focusedBorder: InputBorder.none,
                                 isDense: true,
                                 contentPadding: EdgeInsets.only(
-                                    left: 5, top: 10, bottom: 9),
+                                    left: 5, top: 10, bottom: 10),
                                 hintText: "Date of Birth",
                                 labelText: "Date of Birth",
                                 labelStyle: TextStyle(
@@ -385,73 +385,59 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                       )),
                       Expanded(
                         flex: 2,
-                        child: CustomTextField(
-                          formInputType: TextInputType.text,
-                          formLabel: "Occupation",
-                          formController: lOccupation,
-                          extraLeftPadding: 0,
-                          extraTopPadding: 0,
+                        child: Container(
+                          height: DeviceUtils.getResponsive(
+                              appProvider: appProvider,
+                              mq: mq,
+                              onPhone: mq.size.height / 13.3,
+                              onTablet: mq.size.height / 13.3),
+                          padding: EdgeInsets.only(left: 5),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Color(0xFFB8B8B8))),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                                iconSize: 17.5,
+                                value: selectedYear,
+                                hint: Text(
+                                  "Policy Year",
+                                  style: TextStyle(
+                                      fontFamily: "Kano",
+                                      fontSize: 15,
+                                      color: Colors.black.withOpacity(0.5)),
+                                ),
+                                items: policyYears,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedYear = value;
+                                    if (premium.text.isNotEmpty ||
+                                        sumAssured.text.isNotEmpty) {
+                                      if (premium.text.isNotEmpty) {
+                                        sumAssured.text =
+                                            (int.parse(premium.text) *
+                                                    selectedYear)
+                                                .toString();
+                                      } else if (sumAssured.text.isNotEmpty) {
+                                        premium.text =
+                                            (int.parse(sumAssured.text) /
+                                                    selectedYear)
+                                                .toString();
+                                      }
+                                    }
+                                  });
+                                }),
+                          ),
                         ),
                       )
                     ],
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                  padding: EdgeInsets.only(top: 10, bottom: 10, left: 5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
-                        flex: 1,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          child: Container(
-                            height: DeviceUtils.getResponsive(
-                                appProvider: appProvider,
-                                mq: mq,
-                                onPhone: mq.size.height / 13.3,
-                                onTablet: mq.size.height / 13.3),
-                            padding: EdgeInsets.only(left: 5),
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Color(0xFFB8B8B8))),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton(
-                                  iconSize: 17.5,
-                                  value: selectedYear,
-                                  hint: Text(
-                                    "Policy Year",
-                                    style: TextStyle(
-                                        fontFamily: "Kano",
-                                        fontSize: 15,
-                                        color: Colors.black.withOpacity(0.5)),
-                                  ),
-                                  items: policyYears,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedYear = value;
-                                      if (premium.text.isNotEmpty ||
-                                          sumAssured.text.isNotEmpty) {
-                                        if (premium.text.isNotEmpty) {
-                                          sumAssured.text =
-                                              (int.parse(premium.text) *
-                                                      selectedYear)
-                                                  .toString();
-                                        } else if (sumAssured.text.isNotEmpty) {
-                                          premium.text =
-                                              (int.parse(sumAssured.text) /
-                                                      selectedYear)
-                                                  .toString();
-                                        }
-                                      }
-                                    });
-                                  }),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
                         child: CustomTextField(
                           formLabel: "Premium Payable",
                           formInputType: TextInputType.number,
