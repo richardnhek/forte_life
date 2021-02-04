@@ -24,22 +24,22 @@ class ParametersProvider extends ChangeNotifier {
 
   //
   // Life Proposed's Age
-  int _lpAge = 0;
+  String _lpAge = "0";
 
-  int get lpAge => _lpAge;
+  String get lpAge => _lpAge;
 
-  set lpAge(int i) {
+  set lpAge(String i) {
     _lpAge = i;
     notifyListeners();
   }
 
   //
   // Proposer's Age
-  int _pAge = 0;
+  String _pAge = "0";
 
-  int get pAge => _pAge;
+  String get pAge => _pAge;
 
-  set pAge(int i) {
+  set pAge(String i) {
     _pAge = i;
     notifyListeners();
   }
@@ -73,33 +73,43 @@ class ParametersProvider extends ChangeNotifier {
     _pOccupation = i.toUpperCase();
     notifyListeners();
   }
-
   //
-  //Basic Sum Assured
-  int _basicSA = 0;
-  int get basicSA => _basicSA;
 
-  set basicSA(int i) {
+  //Life Proposed's Occupation
+  String _lpOccupation = " ";
+  String get lpOccupation => _lpOccupation;
+
+  set lpOccupation(String i) {
+    _lpOccupation = i.toUpperCase();
+    notifyListeners();
+  }
+  //
+
+  //Basic Sum Assured
+  String _basicSA = "0";
+  String get basicSA => _basicSA;
+
+  set basicSA(String i) {
     _basicSA = i;
     notifyListeners();
   }
   //
 
   //Annual Premium
-  int _annualP = 0;
-  int get annualP => _annualP;
+  String _annualP = "0";
+  String get annualP => _annualP;
 
-  set annualP(int i) {
+  set annualP(String i) {
     _annualP = i;
     notifyListeners();
   }
 
   //
   //Policy Term
-  int _policyTerm = 0;
-  int get policyTerm => _policyTerm;
+  String _policyTerm = "0";
+  String get policyTerm => _policyTerm;
 
-  set policyTerm(int i) {
+  set policyTerm(String i) {
     _policyTerm = i;
     notifyListeners();
   }

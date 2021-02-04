@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:forte_life/providers/parameters_provider.dart';
 import 'package:forte_life/screens/pdf/pdf_screen_protect_ui.dart';
-import 'package:forte_life/widgets/pdf/pdf_widget.dart';
+import 'package:forte_life/widgets/pdf/pdf_protect_widget.dart';
 import 'package:flutter/widgets.dart' as w;
 import 'package:pdf/widgets.dart' as pw;
+import 'package:provider/provider.dart';
 
 class PDFScreenProtect extends StatefulWidget {
   @override
@@ -36,7 +38,19 @@ class _PDFScreenProtectState extends State<PDFScreenProtect> {
       "/storage/emulated/0/Android/data/com.reahu.forte_life/files/fortelife.pdf");
   @override
   w.Widget build(BuildContext context) {
-    pdf = PDFWidget().createPDF("Testing");
+    ParametersProvider parametersProvider =
+        Provider.of<ParametersProvider>(context);
+    pdf = PDFWidget().createPDF(
+        "Testing",
+        parametersProvider.lpName,
+        parametersProvider.lpAge,
+        parametersProvider.lpGender,
+        parametersProvider.lpOccupation,
+        parametersProvider.pName,
+        parametersProvider.pAge,
+        parametersProvider.pGender,
+        parametersProvider.pOccupation,
+        parametersProvider.basicSA);
     return PDFScreenProtectUI();
   }
 }

@@ -87,6 +87,12 @@ flutter:
     - family: Kano
       fonts:
         - asset: assets/fonts/Kano.otf
+    - family: LiberationSans-Regular
+      fonts:
+        - asset: assets/fonts/LiberationSans-Regular.ttf
+    - family: LiberationSans-Bold
+      fonts:
+        - asset: assets/fonts/LiberationSans-Bold.ttf
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf

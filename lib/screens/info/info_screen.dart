@@ -19,9 +19,11 @@ class _InfoScreenState extends State<InfoScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            FieldTitle(
-              fieldTitle: "For Life Proposed",
-              extraPadding: mq.size.height / 36,
+            Padding(
+              padding: EdgeInsets.only(top: mq.size.height / 36),
+              child: FieldTitle(
+                fieldTitle: "For Life Proposed",
+              ),
             ),
             Container(
               padding: EdgeInsets.all(10),

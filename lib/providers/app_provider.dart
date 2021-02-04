@@ -15,11 +15,11 @@ class AppProvider extends ChangeNotifier {
   //
 
   // LP and P are the same or not
-  bool _samePerson = false;
-  bool get samePerson => _samePerson;
+  bool _differentPerson = false;
+  bool get differentPerson => _differentPerson;
 
-  set samePerson(bool i) {
-    _samePerson = i;
+  set differentPerson(bool i) {
+    _differentPerson = i;
     notifyListeners();
   }
   //

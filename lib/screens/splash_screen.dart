@@ -60,6 +60,21 @@ class _SplashScreenState extends State<SplashScreen>
         .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
   }
 
+  Future<void> getFontFileFromAssets() async {
+    final data =
+        await rootBundle.load("assets/fonts/LiberationSans-Regular.ttf");
+    final dataBold =
+        await rootBundle.load("assets/fonts/LiberationSans-Bold.ttf");
+    final font = new File(
+        "/storage/emulated/0/Android/data/com.reahu.forte_life/files/LiberationSans-Regular.ttf");
+    final fontBold = new File(
+        "/storage/emulated/0/Android/data/com.reahu.forte_life/files/LiberationSans-Bold.ttf");
+    await font.writeAsBytes(
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes));
+    await fontBold.writeAsBytes(dataBold.buffer
+        .asUint8List(dataBold.offsetInBytes, dataBold.lengthInBytes));
+  }
+
   void runAppInitialization() async {
     AppProvider appProvider = Provider.of(context, listen: false);
     appProvider.setAppOrientation();
@@ -67,6 +82,7 @@ class _SplashScreenState extends State<SplashScreen>
     await appProvider.requestPermissions();
     await getExternalStorageDirectory();
     await getImageFileFromAssets("assets/pictures/android/logo/logo.png");
+    await getFontFileFromAssets();
     await determineInitialRoute();
   }
 
