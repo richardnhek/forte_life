@@ -168,43 +168,50 @@ class PDFWidget {
                             ])
                       ]),
                       TableRow(children: [
-                        Column(children: [
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                    padding: EdgeInsets.only(left: 5),
-                                    child: Container(
-                                        width: 100,
-                                        child: Text("Basic Plan : $title",
-                                            style: TextStyle(
-                                                font: regularF, fontSize: 7)))),
-                                PDFSubtitle(
-                                    title: "USD $basicSA", font: regularF),
-                                PDFSubtitle(title: policyTerm, font: regularF),
-                                PDFSubtitle(
-                                    title: premiumPayingTerm, font: regularF),
-                              ]),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                    padding: EdgeInsets.only(left: 5),
-                                    child: Container(
-                                        width: 100,
-                                        child: Text("Rider : $title" + "  Plus",
-                                            style: TextStyle(
-                                                font: regularF, fontSize: 7)))),
-                                PDFSubtitle(
-                                    title: "USD $basicSA", font: regularF),
-                                PDFSubtitle(title: policyTerm, font: regularF),
-                                PDFSubtitle(
-                                    title: premiumPayingTerm, font: regularF),
-                              ]),
-                          Padding(
-                            padding: EdgeInsets.only(right: 10),
-                            child: PDFSubtitle(title: "Yearly", font: regularF),
-                          )
+                        Row(children: [
+                          Column(children: [
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Padding(
+                                      padding: EdgeInsets.only(left: 5),
+                                      child: Container(
+                                          width: 100,
+                                          child: Text("Basic Plan     : $title",
+                                              style: TextStyle(
+                                                  font: regularF,
+                                                  fontSize: 7)))),
+                                  PDFSubtitle(
+                                      title: "USD $basicSA", font: regularF),
+                                  PDFSubtitle(
+                                      title: policyTerm, font: regularF),
+                                  PDFSubtitle(
+                                      title: premiumPayingTerm, font: regularF),
+                                ]),
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Padding(
+                                      padding: EdgeInsets.only(left: 5),
+                                      child: Container(
+                                          width: 100,
+                                          child: Text(
+                                              "Rider            : $title" +
+                                                  "  Plus",
+                                              style: TextStyle(
+                                                  font: regularF,
+                                                  fontSize: 7)))),
+                                  PDFSubtitle(
+                                      title: "USD $basicSA", font: regularF),
+                                  PDFSubtitle(
+                                      title: policyTerm, font: regularF),
+                                  PDFSubtitle(
+                                      title: premiumPayingTerm, font: regularF),
+                                ]),
+                          ]),
+                          PDFSubtitle(title: "Yearly", font: regularF),
                         ])
                       ]),
                     ]))
