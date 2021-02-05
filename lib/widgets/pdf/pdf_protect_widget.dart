@@ -18,6 +18,8 @@ class PDFWidget {
     String pGender,
     String pOccupation,
     String basicSA,
+    String policyTerm,
+    String premiumPayingTerm,
   ) {
     final file = File(
             "/storage/emulated/0/Android/data/com.reahu.forte_life/files/logo.png")
@@ -59,7 +61,7 @@ class PDFWidget {
                                 "Tel: (+855) 23 885 077/ 066 Fax: (+855) 23 986 922" +
                                 "\n" +
                                 "Email: info@fortelifeassurance.com",
-                            style: TextStyle(fontSize: 6, font: boldF))),
+                            style: TextStyle(fontSize: 5, font: boldF))),
                   ),
                 ]),
                 SizedBox(height: 20),
@@ -85,7 +87,7 @@ class PDFWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
-                                padding: EdgeInsets.only(left: 10),
+                                padding: EdgeInsets.only(left: 5),
                                 child: Container(width: 100),
                               ),
                               PDFSubtitle(title: "Name", font: boldF),
@@ -104,13 +106,12 @@ class PDFWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Padding(
-                                    padding: EdgeInsets.only(left: 10),
+                                    padding: EdgeInsets.only(left: 5),
                                     child: Container(
                                         width: 100,
                                         child: Text("Life Proposed",
                                             style: TextStyle(
-                                                font: regularF,
-                                                fontSize: 10)))),
+                                                font: regularF, fontSize: 7)))),
                                 PDFSubtitle(title: lpName, font: regularF),
                                 PDFSubtitle(title: lpAge, font: regularF),
                                 PDFSubtitle(title: lpGender, font: regularF),
@@ -124,13 +125,12 @@ class PDFWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Padding(
-                                    padding: EdgeInsets.only(left: 10),
+                                    padding: EdgeInsets.only(left: 5),
                                     child: Container(
                                         width: 100,
                                         child: Text("Proposer",
                                             style: TextStyle(
-                                                font: regularF,
-                                                fontSize: 10)))),
+                                                font: regularF, fontSize: 7)))),
                                 PDFSubtitle(title: pName, font: regularF),
                                 PDFSubtitle(title: pAge, font: regularF),
                                 PDFSubtitle(title: pGender, font: regularF),
@@ -146,11 +146,17 @@ class PDFWidget {
                         Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              Container(
+                                  width: 100,
+                                  child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text("Type of Benefits",
+                                          style: TextStyle(
+                                              font: boldF, fontSize: 7)))),
                               Padding(
-                                  padding: EdgeInsets.only(left: 10),
+                                  padding: EdgeInsets.only(left: 5),
                                   child: PDFSubtitle(
-                                      title: "Type of Benefits", font: boldF)),
-                              PDFSubtitle(title: "Sum Insured", font: boldF),
+                                      title: "Sum Insured", font: boldF)),
                               PDFSubtitle(title: "Policy Term", font: boldF),
                               PDFSubtitle(
                                   title: "Premium Paying Term", font: boldF),
@@ -160,6 +166,46 @@ class PDFWidget {
                                     title: "Payment Mode", font: boldF),
                               )
                             ])
+                      ]),
+                      TableRow(children: [
+                        Column(children: [
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                    padding: EdgeInsets.only(left: 5),
+                                    child: Container(
+                                        width: 100,
+                                        child: Text("Basic Plan : $title",
+                                            style: TextStyle(
+                                                font: regularF, fontSize: 7)))),
+                                PDFSubtitle(
+                                    title: "USD $basicSA", font: regularF),
+                                PDFSubtitle(title: policyTerm, font: regularF),
+                                PDFSubtitle(
+                                    title: premiumPayingTerm, font: regularF),
+                              ]),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                    padding: EdgeInsets.only(left: 5),
+                                    child: Container(
+                                        width: 100,
+                                        child: Text("Rider : $title" + "  Plus",
+                                            style: TextStyle(
+                                                font: regularF, fontSize: 7)))),
+                                PDFSubtitle(
+                                    title: "USD $basicSA", font: regularF),
+                                PDFSubtitle(title: policyTerm, font: regularF),
+                                PDFSubtitle(
+                                    title: premiumPayingTerm, font: regularF),
+                              ]),
+                          Padding(
+                            padding: EdgeInsets.only(right: 10),
+                            child: PDFSubtitle(title: "Yearly", font: regularF),
+                          )
+                        ])
                       ]),
                     ]))
               ])));

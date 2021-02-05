@@ -41,7 +41,7 @@ class _PDFScreenProtectState extends State<PDFScreenProtect> {
     ParametersProvider parametersProvider =
         Provider.of<ParametersProvider>(context);
     pdf = PDFWidget().createPDF(
-        "Testing",
+        "Forte Protect",
         parametersProvider.lpName,
         parametersProvider.lpAge,
         parametersProvider.lpGender,
@@ -50,7 +50,9 @@ class _PDFScreenProtectState extends State<PDFScreenProtect> {
         parametersProvider.pAge,
         parametersProvider.pGender,
         parametersProvider.pOccupation,
-        parametersProvider.basicSA);
+        parametersProvider.basicSA,
+        parametersProvider.policyTerm,
+        parametersProvider.policyTerm);
     return PDFScreenProtectUI();
   }
 }

@@ -11,8 +11,8 @@ class PDFSubtitle extends StatelessWidget {
   @override
   Widget build(Context context) {
     return Container(
-        width: 80,
+        width: 90,
         child: Center(
-            child: Text(title, style: TextStyle(fontSize: 8, font: font))));
+            child: Text(title, style: TextStyle(fontSize: 7, font: font))));
   }
 }
