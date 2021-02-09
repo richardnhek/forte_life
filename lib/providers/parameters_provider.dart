@@ -114,5 +114,29 @@ class ParametersProvider extends ChangeNotifier {
     notifyListeners();
   }
   //
+
+  //Ryder SA
+  String _ryderSA = "0";
+  String get ryderSA => _ryderSA;
+
+  set ryderSA(String i) {
+    _ryderSA = i;
+    notifyListeners();
+  }
+  //
+
+  //Get Rate
+
+  //
+
+  //Total Premium
+  String _totalPremium = "0";
+  String get totalPremium => _totalPremium;
+
+  set totalPremium(String i) {
+    _totalPremium = i;
+    notifyListeners();
+  }
+  //
 //
 }

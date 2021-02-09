@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AddedRyder extends StatelessWidget {
-  AddedRyder({this.formController});
+  AddedRyder({this.formController, this.onChange});
 
   final TextEditingController formController;
+  final Function onChange;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -13,9 +14,9 @@ class AddedRyder extends StatelessWidget {
         decoration: BoxDecoration(border: Border.all(color: Color(0xFFB8B8B8))),
         child: TextFormField(
           autovalidateMode: AutovalidateMode.onUserInteraction,
-          readOnly: true,
           textAlignVertical: TextAlignVertical.bottom,
           controller: formController,
+          onChanged: onChange,
           decoration: InputDecoration(
               disabledBorder: InputBorder.none,
               enabledBorder: InputBorder.none,
@@ -37,7 +38,7 @@ class AddedRyder extends StatelessWidget {
           style: TextStyle(
             color: Colors.black,
             fontSize: 15,
-            fontFamily: "Biko",
+            fontFamily: "Kano",
           ),
         ),
       ),

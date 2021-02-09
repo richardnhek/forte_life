@@ -27,6 +27,7 @@ class _PDFScreenProtectUIState extends State<PDFScreenProtectUI> {
               : SafeArea(
                   child: SfPdfViewer.file(
                     file,
+                    initialZoomLevel: 1.2,
                     pageSpacing: 0,
                   ),
                 )),

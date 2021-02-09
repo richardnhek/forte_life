@@ -17,6 +17,7 @@ class _PDFScreenProtectState extends State<PDFScreenProtect> {
   @override
   void initState() {
     super.initState();
+
     getPDF();
   }
 
@@ -41,18 +42,20 @@ class _PDFScreenProtectState extends State<PDFScreenProtect> {
     ParametersProvider parametersProvider =
         Provider.of<ParametersProvider>(context);
     pdf = PDFWidget().createPDF(
-        "Forte Protect",
-        parametersProvider.lpName,
-        parametersProvider.lpAge,
-        parametersProvider.lpGender,
-        parametersProvider.lpOccupation,
-        parametersProvider.pName,
-        parametersProvider.pAge,
-        parametersProvider.pGender,
-        parametersProvider.pOccupation,
-        parametersProvider.basicSA,
-        parametersProvider.policyTerm,
-        parametersProvider.policyTerm);
+      "Forte Protect",
+      parametersProvider.lpName,
+      parametersProvider.lpAge,
+      parametersProvider.lpGender,
+      parametersProvider.lpOccupation,
+      parametersProvider.pName,
+      parametersProvider.pAge,
+      parametersProvider.pGender,
+      parametersProvider.pOccupation,
+      parametersProvider.basicSA,
+      parametersProvider.policyTerm,
+      parametersProvider.annualP,
+      parametersProvider.ryderSA,
+    );
     return PDFScreenProtectUI();
   }
 }

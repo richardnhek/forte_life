@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:forte_life/providers/app_provider.dart';
 import 'package:forte_life/providers/parameters_provider.dart';
 import 'package:forte_life/utils/device_utils.dart';
-import 'package:forte_life/widgets/added_ryder.dart';
 import 'package:forte_life/widgets/calculate_button.dart';
 import 'package:forte_life/widgets/custom_text_field.dart';
 import 'package:forte_life/widgets/dropdown_text.dart';
@@ -47,12 +46,11 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   TextEditingController lOccupation = TextEditingController();
   TextEditingController policyYear = TextEditingController();
 
-  TextEditingController ryderAdded = TextEditingController();
+  TextEditingController ryderAdded = new TextEditingController();
 
   String lSelectedGender;
   String pSelectedGender;
   int selectedYear;
-  int selectedRyder;
 
   List<DropdownMenuItem> genderTypes = [
     DropdownMenuItem(
@@ -76,14 +74,6 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
     DropdownMenuItem(child: DropDownText(title: "35"), value: 35)
   ];
 
-  List<DropdownMenuItem> ryderList = [
-    DropdownMenuItem(child: Text("1"), value: 1),
-    DropdownMenuItem(child: Text("2"), value: 2),
-    DropdownMenuItem(child: Text("3"), value: 3),
-    DropdownMenuItem(child: Text("4"), value: 4),
-    DropdownMenuItem(child: Text("5"), value: 5),
-  ];
-
   DateTime _selectedDate;
   DateTime _currentDate = DateTime.now();
   //
@@ -98,6 +88,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
     AppProvider appProvider = Provider.of<AppProvider>(context);
     final mq = MediaQuery.of(context);
     final _formKey = GlobalKey<FormState>();
+
     //Calculate and Generate PDF
     void calculateAndPDF() {
       ParametersProvider parametersProvider =
@@ -134,6 +125,9 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
       parametersProvider.policyTerm = selectedYear.toString();
       parametersProvider.annualP = premium.text.toString();
       parametersProvider.basicSA = sumAssured.text.toString();
+      parametersProvider.ryderSA = ryderAdded.text.toString();
+      parametersProvider.totalPremium =
+          (int.parse(premium.text) + int.parse(ryderAdded.text)).toString();
       appProvider.activeTabIndex = 1;
       Navigator.of(context).pushNamed("/main_flow");
     }
@@ -541,50 +535,17 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                       }),
                 ),
                 Visibility(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 5, bottom: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: DeviceUtils.getResponsive(
-                                appProvider: appProvider,
-                                mq: mq,
-                                onPhone: mq.size.height / 13.3,
-                                onTablet: mq.size.height / 13.3),
-                            padding: EdgeInsets.only(left: 10),
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Color(0xFFB8B8B8))),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton(
-                                  value: selectedRyder,
-                                  hint: Text(
-                                    "Ryder",
-                                    style: TextStyle(
-                                        fontFamily: "Kano",
-                                        fontSize: 15,
-                                        color: Colors.black.withOpacity(0.5)),
-                                  ),
-                                  items: ryderList,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedRyder = value;
-                                    });
-                                  }),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                            flex: 2,
-                            child: AddedRyder(
-                              formController: ryderAdded,
-                            ))
-                      ],
-                    ),
-                  ),
-                  visible: appProvider.addRyder,
-                ),
+                    visible: appProvider.addRyder,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 15),
+                      child: CustomTextField(
+                        formInputType: TextInputType.number,
+                        formLabel: "Added Ryder",
+                        formController: ryderAdded,
+                        extraLeftPadding: 5,
+                        extraTopPadding: 0,
+                      ),
+                    )),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -600,7 +561,31 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                         padding: EdgeInsets.all(5),
                         child: ResetButton(
                           onPressed: () {
-                            print("Reset");
+                            //Proposer
+                            pFirstName.clear();
+                            pLastName.clear();
+                            pAge.clear();
+                            pDob.clear();
+                            pGender.clear();
+                            pOccupation.clear();
+                            //
+
+                            //Life Proposed
+                            firstName.clear();
+                            lastName.clear();
+                            age.clear();
+                            dob.clear();
+                            sumAssured.clear();
+                            premium.clear();
+                            gender.clear();
+                            lOccupation.clear();
+                            policyYear.clear();
+
+                            ryderAdded.clear();
+
+                            lSelectedGender = null;
+                            pSelectedGender = null;
+                            selectedYear = 0;
                           },
                         ))
                   ],
@@ -671,7 +656,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
 
   //Validate age limitations
   bool checkAgeLimit(int pYear, int age) {
-    if (pYear + age <= 69) {
+    if (pYear + age <= 59) {
       return true;
     } else {
       return false;

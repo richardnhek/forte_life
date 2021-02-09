@@ -12,6 +12,7 @@ class LoginScreenUI extends StatelessWidget {
     AppProvider appProvider = Provider.of<AppProvider>(context, listen: false);
     final mq = MediaQuery.of(context);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
