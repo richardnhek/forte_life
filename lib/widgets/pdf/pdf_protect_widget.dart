@@ -21,6 +21,7 @@ class PDFWidget {
       String basicSA,
       String policyTerm,
       String premium,
+      String premiumRyder,
       String ryderSA) {
     //Final variables
     final file = File(
@@ -46,11 +47,10 @@ class PDFWidget {
     };
 
     //Doubles with no previous values
-    double accumulatedP = 0;
+    double accumulatedPremium = 0;
     double totalSA = 0;
     double allCauses = 0;
     double allAccidents = 0;
-    double premiumRyder = 0;
     double cashValue = 0;
     //
 
@@ -58,23 +58,29 @@ class PDFWidget {
     double basicSANum = double.parse(basicSA);
     double ryderSANum = double.parse(ryderSA);
     double premiumNum = double.parse(premium);
+    double premiumRyderNum = double.parse(premiumRyder);
     //
 
     //Calculations
-    // double totalP = premiumNum + premiumRyder;
-    double totalP = premiumNum;
+    double totalPremium = premiumNum + premiumRyderNum;
     //
 
     //Round all the doubles to a .00 decimal format
-    String halfP = (totalP * 0.5178).toStringAsFixed(2);
-    String quarterlyP = (totalP * 0.2635).toStringAsFixed(2);
-    String monthlyP = (totalP * 0.0888).toStringAsFixed(2);
+    String halfP = (totalPremium * 0.5178).toStringAsFixed(2);
+    String quarterlyP = (totalPremium * 0.2635).toStringAsFixed(2);
+    String monthlyP = (totalPremium * 0.0888).toStringAsFixed(2);
+    String ryderSAStr = ryderSANum.toStringAsFixed(0);
+    String premiumStr = premiumNum.toStringAsFixed(2);
+    String premiumRyderStr = premiumRyderNum.toStringAsFixed(2);
+    String totalPremiumStr = totalPremium.toStringAsFixed(2);
+    String accumulatedPremiumStr = totalPremium.toStringAsFixed(2);
     //
 
     List<List<dynamic>> getDynamicRow(int policyYear, int age) {
       List<List<dynamic>> dynamicRow = List();
       int i = 1;
-      accumulatedP += totalP;
+      accumulatedPremium += totalPremium;
+      accumulatedPremiumStr = accumulatedPremium.toStringAsFixed(2);
       switch (age) {
         case 1:
           {
@@ -83,8 +89,8 @@ class PDFWidget {
             dynamicRow = [
               [
                 "     $i     ",
-                "         $totalP                    $accumulatedP     ",
-                "         $allCauses                  $allAccidents     ",
+                "         $totalPremiumStr               $accumulatedPremiumStr     ",
+                "         $allCauses                $allAccidents     ",
                 allAccidents,
                 "-"
               ],
@@ -94,8 +100,8 @@ class PDFWidget {
             allAccidents = (basicSANum * 1.6) + ryderSANum;
             dynamicRow.add([
               "     $i      ",
-              "         $totalP                    $accumulatedP     ",
-              "         $allCauses                  $allAccidents     ",
+              "         $totalPremiumStr              $accumulatedPremiumStr     ",
+              "         $allCauses            $allAccidents     ",
               allAccidents,
               "-"
             ]);
@@ -108,8 +114,8 @@ class PDFWidget {
             dynamicRow = [
               [
                 "     $i     ",
-                "         $totalP                    $accumulatedP     ",
-                "         $allCauses                  $allAccidents     ",
+                "         $totalPremiumStr              $accumulatedPremiumStr     ",
+                "         $allCauses            $allAccidents     ",
                 allAccidents,
                 "-"
               ],
@@ -125,8 +131,8 @@ class PDFWidget {
             dynamicRow = [
               [
                 "     $i     ",
-                "         $totalP                    $accumulatedP     ",
-                "         $allCauses                  $allAccidents     ",
+                "         $totalPremiumStr              $accumulatedPremiumStr     ",
+                "         $allCauses            $allAccidents     ",
                 allAccidents,
                 "-"
               ]
@@ -138,11 +144,12 @@ class PDFWidget {
       allCauses = basicSANum + ryderSANum;
       allAccidents = (basicSANum * 2) + ryderSANum;
       while (i <= policyYear) {
-        accumulatedP += totalP;
+        accumulatedPremium += totalPremium;
+        accumulatedPremiumStr = accumulatedPremium.toStringAsFixed(2);
         dynamicRow.add([
           "     $i      ",
-          "         $totalP                    $accumulatedP     ",
-          "         $allCauses                  $allAccidents     ",
+          "         $totalPremiumStr              $accumulatedPremiumStr     ",
+          "         $allCauses            $allAccidents     ",
           allAccidents,
           "-"
         ]);
@@ -156,7 +163,7 @@ class PDFWidget {
       List<String> dynamicHeader = [
         "End of Policy Year",
         "                Premium (USD) \n \n    Annualized       Accumulated   ",
-        "          Total Death/TPD (USD) \n \n       All Causes        Accidents    ",
+        "          Total Death/TPD (USD) \n \n       All Causes         Accidents    ",
         "Cash Value",
         "Guaranteed Special Benefit"
       ];
@@ -349,7 +356,7 @@ class PDFWidget {
                                                         font: regularF,
                                                         fontSize: 7)))),
                                         PDFSubtitle(
-                                            title: "USD $basicSA",
+                                            title: "USD $ryderSAStr",
                                             font: regularF),
                                         Padding(
                                           padding: EdgeInsets.only(left: 2.5),
@@ -409,10 +416,10 @@ class PDFWidget {
                                     padding: EdgeInsets.only(left: 50),
                                     child: Column(children: [
                                       PDFSubtitle(
-                                          title: "USD $premium",
+                                          title: "USD $premiumStr",
                                           font: regularF),
                                       PDFSubtitle(
-                                          title: "USD $premiumRyder",
+                                          title: "USD $premiumRyderStr",
                                           font: regularF),
                                     ]))
                               ]),
@@ -431,7 +438,8 @@ class PDFWidget {
                                 Padding(
                                   padding: EdgeInsets.only(left: 50),
                                   child: PDFSubtitle(
-                                      title: "USD $totalP", font: regularF),
+                                      title: "USD $totalPremiumStr",
+                                      font: regularF),
                                 )
                               ])
                         ]),
@@ -456,7 +464,7 @@ class PDFWidget {
                               children: [
                                 Column(children: [
                                   PDFSubtitle(title: "Yearly", font: regularF),
-                                  PDFSubtitle(title: "USD $totalP")
+                                  PDFSubtitle(title: "USD $totalPremiumStr")
                                 ]),
                                 Column(children: [
                                   PDFSubtitle(

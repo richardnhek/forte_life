@@ -115,7 +115,7 @@ class ParametersProvider extends ChangeNotifier {
   }
   //
 
-  //Ryder SA
+  //Rider SA
   String _ryderSA = "0";
   String get ryderSA => _ryderSA;
 
@@ -125,8 +125,14 @@ class ParametersProvider extends ChangeNotifier {
   }
   //
 
-  //Get Rate
+  //Premium Rider
+  String _premiumRyder = "0";
+  String get premiumRyder => _premiumRyder;
 
+  set premiumRyder(String i) {
+    _premiumRyder = i;
+    notifyListeners();
+  }
   //
 
   //Total Premium

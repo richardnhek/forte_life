@@ -54,6 +54,7 @@ class _PDFScreenProtectState extends State<PDFScreenProtect> {
       parametersProvider.basicSA,
       parametersProvider.policyTerm,
       parametersProvider.annualP,
+      parametersProvider.premiumRyder,
       parametersProvider.ryderSA,
     );
     return PDFScreenProtectUI();

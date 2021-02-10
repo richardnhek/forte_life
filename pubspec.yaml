@@ -70,6 +70,7 @@ flutter:
     - assets/pictures/android/gradient1.png
     - assets/pictures/android/gradient2.png
     - assets/pictures/android/gradient3.png
+    - assets/rate/rate.xlsx
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
