@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:forte_life/providers/app_provider.dart';
-import 'package:forte_life/utils/device_utils.dart';
 import 'package:forte_life/widgets/calculator_button.dart';
 import 'package:provider/provider.dart';
 

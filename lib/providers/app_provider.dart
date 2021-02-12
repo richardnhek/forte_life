@@ -34,12 +34,12 @@ class AppProvider extends ChangeNotifier {
   }
   //
 
-  // Add Ryder
-  bool _addRyder = false;
-  bool get addRyder => _addRyder;
+  // Add Rider
+  bool _addRider = false;
+  bool get addRider => _addRider;
 
-  set addRyder(bool i) {
-    _addRyder = i;
+  set addRider(bool i) {
+    _addRider = i;
     notifyListeners();
   }
   //

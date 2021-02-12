@@ -1,21 +1,21 @@
-import 'dart:io';
-
 import 'package:excel/excel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:forte_life/providers/app_provider.dart';
 import 'package:forte_life/providers/parameters_provider.dart';
-import 'package:forte_life/utils/device_utils.dart';
 import 'package:forte_life/widgets/calculate_button.dart';
+import 'package:forte_life/widgets/custom_datepicker.dart';
+import 'package:forte_life/widgets/custom_dropdown.dart';
+import 'package:forte_life/widgets/custom_switch.dart';
 import 'package:forte_life/widgets/custom_text_field.dart';
 import 'package:forte_life/widgets/dropdown_text.dart';
 import 'package:forte_life/widgets/field_title.dart';
 import 'package:forte_life/widgets/reset_button.dart';
+
 import 'package:intl/intl.dart';
 import 'package:forte_life/widgets/age_field.dart';
 import 'package:provider/provider.dart';
-import 'dart:convert' show utf8;
 
 class CalculationProtectUI extends StatefulWidget {
   @override
@@ -49,13 +49,15 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   TextEditingController gender = TextEditingController();
   TextEditingController lOccupation = TextEditingController();
   TextEditingController policyYear = TextEditingController();
-  TextEditingController ryderAdded = new TextEditingController();
+  TextEditingController riderAdded = new TextEditingController();
   //
 
   String lSelectedGender;
   String pSelectedGender;
-  int selectedYear;
-  double premiumRyder;
+  int selectedYear = 10;
+  double premiumRider;
+  String selectedMode = "Yearly";
+  double premiumNum;
 
   List<DropdownMenuItem> genderTypes = [
     DropdownMenuItem(
@@ -68,6 +70,29 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
           title: "Female",
         ),
         value: "Female")
+  ];
+
+  List<DropdownMenuItem> paymentMode = [
+    DropdownMenuItem(
+        child: DropDownText(
+          title: "Yearly",
+        ),
+        value: "Yearly"),
+    DropdownMenuItem(
+        child: DropDownText(
+          title: "Half-yearly",
+        ),
+        value: "Half-yearly"),
+    DropdownMenuItem(
+        child: DropDownText(
+          title: "Quarterly",
+        ),
+        value: "Quarterly"),
+    DropdownMenuItem(
+        child: DropDownText(
+          title: "Monthly",
+        ),
+        value: "Monthly")
   ];
 
   List<DropdownMenuItem> policyYears = [
@@ -141,16 +166,43 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
         Sheet sheetObj = excel['Male'];
         row = ageParam - 17;
         var cellResult = sheetObj.cell(CellIndex.indexByString("$column$row"));
-        premiumRyder =
-            (cellResult.value * double.parse(ryderAdded.text)) / 1000;
+        premiumRider =
+            (cellResult.value * double.parse(riderAdded.text)) / 1000;
       } else {
         Sheet sheetObj = excel['Female'];
+        row = ageParam - 17;
+        var cellResult = sheetObj.cell(CellIndex.indexByString("$column$row"));
+        premiumRider =
+            (cellResult.value * double.parse(riderAdded.text)) / 1000;
       }
     }
     //
 
-    // Check Parameters
-    bool checkParameters() {}
+    //Get each value of each Payment Mode
+    List<double> paymentModeValue(String selectedMode) {
+      switch (selectedMode) {
+        case "Yearly":
+          {
+            return [1, 1];
+          }
+        case "Half-yearly":
+          {
+            return [2, 0.5178];
+          }
+        case "Quarterly":
+          {
+            return [4, 0.2635];
+          }
+        case "Monthly":
+          {
+            return [12, 0.0888];
+          }
+        default:
+          {
+            return [1, 1];
+          }
+      }
+    }
     //
 
     //Calculate and Generate PDF
@@ -169,27 +221,38 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
         });
       } else {
         setState(() {
+          //Proposer
           parametersProvider.pName =
               pFirstName.text.toString() + " " + pLastName.text.toString();
           parametersProvider.pAge = pAge.text.toString();
           parametersProvider.pGender = pSelectedGender.toString();
           parametersProvider.pOccupation = pOccupation.text.toString();
+          //
 
+          //Life Proposed
           parametersProvider.lpName =
               lastName.text.toString() + " " + firstName.text.toString();
           parametersProvider.lpAge = age.text.toString();
           parametersProvider.lpGender = lSelectedGender.toString();
           parametersProvider.lpOccupation = lOccupation.text.toString();
+          //
         });
       }
 
+      if (appProvider.addRider == true) {
+        parametersProvider.riderSA = double.parse(riderAdded.text).toString();
+        parametersProvider.premiumRider = premiumRider.toString();
+        parametersProvider.totalPremium =
+            (premiumNum + premiumRider).toString();
+      } else {
+        parametersProvider.riderSA = "0";
+        parametersProvider.premiumRider = "0";
+        parametersProvider.totalPremium = premiumNum.toString();
+      }
+
       parametersProvider.policyTerm = selectedYear.toString();
-      parametersProvider.annualP = premium.text.toString();
+      parametersProvider.annualP = premiumNum.toString();
       parametersProvider.basicSA = sumAssured.text.toString();
-      parametersProvider.ryderSA = ryderAdded.text.toString();
-      parametersProvider.premiumRyder = premiumRyder.toString();
-      parametersProvider.totalPremium =
-          (double.parse(premium.text) + premiumRyder).toString();
       appProvider.activeTabIndex = 1;
       Navigator.of(context).pushNamed("/main_flow");
     }
@@ -197,411 +260,350 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
 
     return SafeArea(
       child: SingleChildScrollView(
+        controller: ScrollController(),
         child: Container(
           padding: EdgeInsets.symmetric(
-              horizontal: 20, vertical: mq.size.height / 9),
+              horizontal: 20, vertical: mq.size.height / 9.5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                child: SwitchListTile(
-                    title: Text(
-                      "Buying For Someone Else",
-                      style: TextStyle(
-                          fontFamily: "Kano",
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black.withOpacity(0.5)),
-                    ),
-                    activeColor: Color(0xFF8AB84B),
-                    dense: true,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 5),
-                    value: appProvider.differentPerson,
-                    onChanged: (bool) {
-                      setState(() {
-                        appProvider.differentPerson = bool;
-                      });
-                    }),
+              CustomSwitch(
+                value: appProvider.differentPerson,
+                title: "Buying For Someone Else",
+                onChanged: (bool) {
+                  setState(() {
+                    appProvider.differentPerson = bool;
+                  });
+                },
               ),
               Visibility(
                 child: Padding(
-                  padding: EdgeInsets.only(top: 15, bottom: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FieldTitle(
-                        fieldTitle: "Proposer",
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 5),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: CustomTextField(
-                                  formLabel: "First Name",
-                                  formInputType: TextInputType.name,
-                                  formController: pFirstName,
-                                  extraLeftPadding: 5,
-                                  extraTopPadding: 0,
-                                ),
-                              ),
-                              Expanded(
-                                child: CustomTextField(
-                                    formLabel: "Last Name",
-                                    formInputType: TextInputType.name,
-                                    formController: pLastName,
-                                    extraLeftPadding: 5,
-                                    extraTopPadding: 0),
-                              ),
-                            ]),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 5),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                  flex: 1,
-                                  child: AgeField(
-                                    formController: pAge,
-                                  )),
-                              Expanded(
-                                flex: 2,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      border:
-                                          Border.all(color: Color(0xFFB8B8B8))),
-                                  child: TextField(
-                                    textAlignVertical: TextAlignVertical.bottom,
-                                    decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        focusedBorder: InputBorder.none,
-                                        isDense: true,
-                                        contentPadding: EdgeInsets.only(
-                                            left: 5, top: 10, bottom: 10),
-                                        hintText: "Date of Birth",
-                                        labelText: "Date of Birth",
-                                        labelStyle: TextStyle(
-                                            fontFamily: "Kano",
-                                            fontSize: 15,
-                                            color:
-                                                Colors.black.withOpacity(0.5)),
-                                        hintStyle: TextStyle(
-                                            fontFamily: "Kano",
-                                            fontSize: 15,
-                                            color:
-                                                Colors.black.withOpacity(0.5))),
-                                    focusNode: AlwaysDisabledFocusNode(),
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                        fontFamily: "Kano"),
-                                    controller: pDob,
-                                    onTap: () {
-                                      _selectDate(context, pDob, pAge);
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ]),
-                      ),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    padding: EdgeInsets.symmetric(horizontal: 5),
+                    child: Form(
+                      key: _formKey,
+                      autovalidateMode: AutovalidateMode.always,
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                                child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 5),
-                              child: Container(
-                                height: DeviceUtils.getResponsive(
-                                    appProvider: appProvider,
-                                    mq: mq,
-                                    onPhone: mq.size.height / 13.3,
-                                    onTablet: mq.size.height / 13.3),
-                                padding: EdgeInsets.only(left: 5),
-                                decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Color(0xFFB8B8B8))),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton(
-                                      iconSize: 17.5,
+                            FieldTitle(
+                              fieldTitle: "Proposer",
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                              width: mq.size.width,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: CustomTextField(
+                                      formLabel: "First Name",
+                                      formInputType: TextInputType.name,
+                                      formController: pFirstName,
+                                    ),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Expanded(
+                                    child: CustomTextField(
+                                      formLabel: "Last Name",
+                                      formInputType: TextInputType.name,
+                                      formController: pLastName,
+                                      onChange: (value) async {},
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Container(
+                              width: mq.size.width,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                      flex: 1,
+                                      child: AgeField(
+                                        formController: pAge,
+                                      )),
+                                  SizedBox(width: 5),
+                                  Expanded(
+                                      flex: 2,
+                                      child: CustomDatePicker(
+                                        focusNode: AlwaysDisabledFocusNode(),
+                                        dob: pDob,
+                                        onTap: () {
+                                          _selectDate(context, pDob, pAge);
+                                        },
+                                      )),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Container(
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                        child: CustomDropDown(
+                                      title: "Gender",
                                       value: pSelectedGender,
-                                      hint: Text(
-                                        "Gender",
-                                        style: TextStyle(
-                                            fontFamily: "Kano",
-                                            fontSize: 15,
-                                            color:
-                                                Colors.black.withOpacity(0.5)),
-                                      ),
                                       items: genderTypes,
-                                      onChanged: (value) {
+                                      onChange: (value) {
                                         setState(() {
                                           pSelectedGender = value;
                                         });
-                                      }),
-                                ),
-                              ),
-                            )),
-                            Expanded(
-                              flex: 2,
-                              child: CustomTextField(
-                                formInputType: TextInputType.text,
-                                formLabel: "Occupation",
-                                formController: pOccupation,
-                                extraLeftPadding: 0,
-                                extraTopPadding: 0,
-                              ),
+                                      },
+                                    )),
+                                    SizedBox(width: 5),
+                                    Expanded(
+                                      flex: 2,
+                                      child: CustomTextField(
+                                        formInputType: TextInputType.text,
+                                        formLabel: "Occupation",
+                                        formController: pOccupation,
+                                      ),
+                                    )
+                                  ]),
                             )
-                          ])
-                    ],
-                  ),
-                ),
+                          ]),
+                    )),
                 visible: appProvider.differentPerson,
               ),
-              FieldTitle(
-                fieldTitle: "Life Proposed",
-              ),
+              SizedBox(height: 15),
               Padding(
-                padding: EdgeInsets.only(bottom: 5, top: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: CustomTextField(
-                        formLabel: "First Name",
-                        formInputType: TextInputType.name,
-                        formController: firstName,
-                        extraLeftPadding: 5,
-                        extraTopPadding: 0,
-                        onChange: () async {},
-                      ),
-                    ),
-                    Expanded(
-                      child: CustomTextField(
-                        formLabel: "Last Name",
-                        formInputType: TextInputType.name,
-                        formController: lastName,
-                        extraLeftPadding: 5,
-                        extraTopPadding: 0,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                      flex: 1,
-                      child: AgeField(
-                        formController: age,
-                      )),
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xFFB8B8B8))),
-                      child: TextField(
-                        textAlignVertical: TextAlignVertical.bottom,
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            isDense: true,
-                            contentPadding:
-                                EdgeInsets.only(left: 5, top: 10, bottom: 10),
-                            hintText: "Date of Birth",
-                            labelText: "Date of Birth",
-                            labelStyle: TextStyle(
-                                fontFamily: "Kano",
-                                fontSize: 15,
-                                color: Colors.black.withOpacity(0.5)),
-                            hintStyle: TextStyle(
-                                fontFamily: "Kano",
-                                fontSize: 15,
-                                color: Colors.black.withOpacity(0.5))),
-                        focusNode: AlwaysDisabledFocusNode(),
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: "Kano",
-                            fontSize: 15),
-                        controller: dob,
-                        onTap: () {
-                          _selectDate(context, dob, age);
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 5, bottom: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                padding: EdgeInsets.symmetric(horizontal: 5),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                        child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5),
-                      child: Container(
-                        height: DeviceUtils.getResponsive(
-                            appProvider: appProvider,
-                            mq: mq,
-                            onPhone: mq.size.height / 13.3,
-                            onTablet: mq.size.height / 13.3),
-                        padding: EdgeInsets.only(left: 5),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Color(0xFFB8B8B8))),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                              iconSize: 17.5,
-                              value: lSelectedGender,
-                              hint: Text(
-                                "Gender",
-                                style: TextStyle(
-                                    fontFamily: "Kano",
-                                    fontSize: 15,
-                                    color: Colors.black.withOpacity(0.5)),
-                              ),
-                              items: genderTypes,
-                              onChanged: (value) {
-                                setState(() {
-                                  lSelectedGender = value;
-                                });
-                              }),
-                        ),
+                    FieldTitle(
+                      fieldTitle: "Life Proposed",
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      width: mq.size.width,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: CustomTextField(
+                              formLabel: "First Name",
+                              formInputType: TextInputType.name,
+                              formController: firstName,
+                            ),
+                          ),
+                          SizedBox(width: 5),
+                          Expanded(
+                            child: CustomTextField(
+                              formLabel: "Last Name",
+                              formInputType: TextInputType.name,
+                              formController: lastName,
+                            ),
+                          ),
+                        ],
                       ),
-                    )),
-                    Expanded(
-                      flex: 2,
-                      child: CustomTextField(
-                        formInputType: TextInputType.text,
-                        formLabel: "Occupation",
-                        formController: lOccupation,
-                        extraLeftPadding: 0,
-                        extraTopPadding: 0,
+                    ),
+                    SizedBox(height: 5),
+                    Container(
+                      width: mq.size.width,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                              flex: 1,
+                              child: AgeField(
+                                formController: age,
+                              )),
+                          SizedBox(width: 5),
+                          Expanded(
+                              flex: 2,
+                              child: CustomDatePicker(
+                                focusNode: AlwaysDisabledFocusNode(),
+                                dob: dob,
+                                onTap: () {
+                                  _selectDate(context, dob, age);
+                                },
+                              )),
+                        ],
                       ),
-                    )
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 10, left: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        height: DeviceUtils.getResponsive(
-                            appProvider: appProvider,
-                            mq: mq,
-                            onPhone: mq.size.height / 13.3,
-                            onTablet: mq.size.height / 13.3),
-                        padding: EdgeInsets.only(left: 5),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Color(0xFFB8B8B8))),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                              iconSize: 17.5,
-                              value: selectedYear,
-                              hint: Text(
-                                "Policy Year",
-                                style: TextStyle(
-                                    fontFamily: "Kano",
-                                    fontSize: 15,
-                                    color: Colors.black.withOpacity(0.5)),
-                              ),
-                              items: policyYears,
-                              onChanged: (value) {
+                    ),
+                    SizedBox(height: 5),
+                    Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                              child: CustomDropDown(
+                            title: "Gender",
+                            value: lSelectedGender,
+                            items: genderTypes,
+                            onChange: (value) {
+                              setState(() {
+                                lSelectedGender = value;
+                              });
+                            },
+                          )),
+                          SizedBox(width: 5),
+                          Expanded(
+                            flex: 2,
+                            child: CustomTextField(
+                              formInputType: TextInputType.text,
+                              formLabel: "Occupation",
+                              formController: lOccupation,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Container(
+                      width: mq.size.width,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: CustomDropDown(
+                              title: "Payment Mode",
+                              value: selectedMode,
+                              items: paymentMode,
+                              onChange: (value) {
                                 setState(() {
-                                  selectedYear = value;
-                                  if (premium.text.isNotEmpty ||
-                                      sumAssured.text.isNotEmpty) {
+                                  selectedMode = value;
+                                  if ((premium.text.isNotEmpty ||
+                                          sumAssured.text.isNotEmpty) &&
+                                      (selectedYear != null)) {
                                     if (premium.text.isNotEmpty) {
-                                      sumAssured.text =
-                                          (int.parse(premium.text) *
-                                                  selectedYear)
-                                              .toString();
+                                      sumAssured.text = ((((double.parse(
+                                                          premium.text) /
+                                                      (paymentModeValue(
+                                                              selectedMode)[1] *
+                                                          paymentModeValue(
+                                                                  selectedMode)[
+                                                              0])) *
+                                                  selectedYear.toDouble())) *
+                                              paymentModeValue(selectedMode)[0])
+                                          .toStringAsFixed(2);
                                     } else if (sumAssured.text.isNotEmpty) {
+                                      premiumNum =
+                                          (double.parse(sumAssured.text) /
+                                                  selectedYear.toDouble()) *
+                                              paymentModeValue(selectedMode)[1];
                                       premium.text =
-                                          (int.parse(sumAssured.text) /
-                                                  selectedYear)
-                                              .toString();
+                                          premiumNum.toStringAsFixed(2);
                                     }
                                   }
                                 });
-                              }),
-                        ),
+                              },
+                            ),
+                          ),
+                          SizedBox(width: 5),
+                          Expanded(
+                            flex: 1,
+                            child: CustomDropDown(
+                              title: "Policy Year",
+                              value: selectedYear,
+                              items: policyYears,
+                              onChange: (value) {
+                                setState(() {
+                                  selectedYear = value;
+                                  if ((premium.text.isNotEmpty ||
+                                          sumAssured.text.isNotEmpty) &&
+                                      selectedMode.isNotEmpty) {
+                                    if (premium.text.isNotEmpty) {
+                                      sumAssured.text = ((((double.parse(
+                                                          premium.text) /
+                                                      (paymentModeValue(
+                                                              selectedMode)[1] *
+                                                          paymentModeValue(
+                                                                  selectedMode)[
+                                                              0])) *
+                                                  selectedYear.toDouble())) *
+                                              paymentModeValue(selectedMode)[0])
+                                          .toStringAsFixed(2);
+                                    } else if (sumAssured.text.isNotEmpty) {
+                                      premiumNum =
+                                          (double.parse(sumAssured.text) /
+                                                  selectedYear.toDouble()) *
+                                              paymentModeValue(selectedMode)[1];
+                                      premium.text =
+                                          premiumNum.toStringAsFixed(2);
+                                    }
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
+                    SizedBox(height: 5),
+                    CustomTextField(
+                      formLabel: "Premium Payable",
+                      formInputType: TextInputType.number,
+                      formController: premium,
+                      onChange: (text) {
+                        if (selectedYear != null) {
+                          if (text == "") {
+                            sumAssured.text = "";
+                          } else
+                            sumAssured.text = ((((double.parse(text) /
+                                                (paymentModeValue(
+                                                        selectedMode)[1] *
+                                                    paymentModeValue(
+                                                        selectedMode)[0])) *
+                                            selectedYear.toDouble())
+                                        .round()) *
+                                    paymentModeValue(selectedMode)[0])
+                                .toStringAsFixed(2);
+                        } else {
+                          sumAssured.text = null;
+                        }
+                      },
+                    ),
+                    SizedBox(height: 5),
+                    CustomTextField(
+                      formLabel: "Sum Assured",
+                      formInputType: TextInputType.number,
+                      formController: sumAssured,
+                      onChange: (text) {
+                        if (selectedYear != null) {
+                          if (text == "") {
+                            premium.text = "";
+                          } else
+                            premiumNum = ((double.parse(text) /
+                                    selectedYear.toDouble()) *
+                                paymentModeValue(selectedMode)[1]);
+                          premium.text = premiumNum.toStringAsFixed(2);
+                        } else {
+                          premium.text = null;
+                        }
+                      },
                     ),
                   ],
                 ),
               ),
-              CustomTextField(
-                formLabel: "Premium Payable",
-                formInputType: TextInputType.number,
-                formController: premium,
-                extraLeftPadding: 5,
-                extraTopPadding: 5,
-                onChange: (text) {
-                  if (selectedYear != null) {
-                    sumAssured.text =
-                        (int.parse(text) * selectedYear).toString();
-                  } else {
-                    sumAssured.text = " ";
-                  }
+              CustomSwitch(
+                value: appProvider.addRider,
+                title: "Add Rider",
+                onChanged: (bool) {
+                  setState(() {
+                    appProvider.addRider = bool;
+                  });
                 },
-              ),
-              CustomTextField(
-                formLabel: "Sum Insured",
-                formInputType: TextInputType.number,
-                formController: sumAssured,
-                extraLeftPadding: 5,
-                extraTopPadding: 5,
-                onChange: (text) {
-                  if (selectedYear != null) {
-                    premium.text = (int.parse(text) / selectedYear).toString();
-                  } else {
-                    premium.text = " ";
-                  }
-                },
-              ),
-              Container(
-                child: SwitchListTile(
-                    title: Text(
-                      "Add Ryder",
-                      style: TextStyle(
-                          fontFamily: "Kano",
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black.withOpacity(0.5)),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 5),
-                    activeColor: Color(0xFF8AB84B),
-                    value: appProvider.addRyder,
-                    onChanged: (bool) {
-                      setState(() {
-                        appProvider.addRyder = bool;
-                      });
-                    }),
               ),
               Visibility(
-                  visible: appProvider.addRyder,
+                  visible: appProvider.addRider,
                   child: Padding(
-                    padding: EdgeInsets.only(bottom: 15),
+                    padding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
                     child: CustomTextField(
                       formInputType: TextInputType.number,
-                      formLabel: "Added Ryder",
-                      formController: ryderAdded,
-                      extraLeftPadding: 5,
-                      extraTopPadding: 0,
+                      formLabel: "Added Rider",
+                      formController: riderAdded,
                     ),
                   )),
               Row(
@@ -611,8 +613,12 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                     padding: EdgeInsets.symmetric(horizontal: 5),
                     child: CalculateButton(
                       onPressed: () async {
-                        await getRate(true, int.parse(age.text), selectedYear);
-                        calculateAndPDF();
+                        if (appProvider.addRider == true) {
+                          await getRate(
+                              true, int.parse(age.text), selectedYear);
+                          calculateAndPDF();
+                        } else
+                          calculateAndPDF();
                       },
                     ),
                   ),
@@ -640,7 +646,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                           lOccupation.clear();
                           policyYear.clear();
 
-                          ryderAdded.clear();
+                          riderAdded.clear();
 
                           lSelectedGender = null;
                           pSelectedGender = null;
@@ -710,14 +716,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   }
   //
 
-  //Validate age limitations
-  bool checkAgeLimit(int pYear, int age) {
-    if (pYear + age <= 59) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  //Validation
 
   //Convert DateTime format to Date form
   String convertDateTimeDisplay(String date) {

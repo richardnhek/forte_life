@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:pdf/widgets.dart';
 
 class PDFSubtitle extends StatelessWidget {

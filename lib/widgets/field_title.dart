@@ -7,7 +7,6 @@ class FieldTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 5, bottom: 15),
       child: Text(
         fieldTitle,
         style: TextStyle(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class ParametersProvider extends ChangeNotifier {
   //Parameters
@@ -103,8 +102,8 @@ class ParametersProvider extends ChangeNotifier {
     _annualP = i;
     notifyListeners();
   }
-
   //
+
   //Policy Term
   String _policyTerm = "0";
   String get policyTerm => _policyTerm;
@@ -115,22 +114,32 @@ class ParametersProvider extends ChangeNotifier {
   }
   //
 
-  //Rider SA
-  String _ryderSA = "0";
-  String get ryderSA => _ryderSA;
+  //Policy Term
+  String _paymentMode = "Yearly";
+  String get paymentMode => _paymentMode;
 
-  set ryderSA(String i) {
-    _ryderSA = i;
+  set paymentMode(String i) {
+    _paymentMode = i;
+    notifyListeners();
+  }
+  //
+
+  //Rider SA
+  String _riderSA = "0";
+  String get riderSA => _riderSA;
+
+  set riderSA(String i) {
+    _riderSA = i;
     notifyListeners();
   }
   //
 
   //Premium Rider
-  String _premiumRyder = "0";
-  String get premiumRyder => _premiumRyder;
+  String _premiumRider = "0";
+  String get premiumRider => _premiumRider;
 
-  set premiumRyder(String i) {
-    _premiumRyder = i;
+  set premiumRider(String i) {
+    _premiumRider = i;
     notifyListeners();
   }
   //

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:forte_life/providers/app_provider.dart';
 import 'package:forte_life/providers/parameters_provider.dart';
 import 'package:forte_life/screens/pdf/pdf_screen_protect_ui.dart';
 import 'package:forte_life/widgets/pdf/pdf_protect_widget.dart';
@@ -41,8 +42,11 @@ class _PDFScreenProtectState extends State<PDFScreenProtect> {
   w.Widget build(BuildContext context) {
     ParametersProvider parametersProvider =
         Provider.of<ParametersProvider>(context);
+    AppProvider appProvider = Provider.of<AppProvider>(context);
     pdf = PDFWidget().createPDF(
       "Forte Protect",
+      appProvider.addRider,
+      appProvider.differentPerson,
       parametersProvider.lpName,
       parametersProvider.lpAge,
       parametersProvider.lpGender,
@@ -53,9 +57,10 @@ class _PDFScreenProtectState extends State<PDFScreenProtect> {
       parametersProvider.pOccupation,
       parametersProvider.basicSA,
       parametersProvider.policyTerm,
+      parametersProvider.paymentMode,
       parametersProvider.annualP,
-      parametersProvider.premiumRyder,
-      parametersProvider.ryderSA,
+      parametersProvider.premiumRider,
+      parametersProvider.riderSA,
     );
     return PDFScreenProtectUI();
   }

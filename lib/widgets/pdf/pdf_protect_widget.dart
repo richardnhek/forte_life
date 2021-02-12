@@ -1,28 +1,30 @@
 import 'dart:typed_data';
 
-import 'package:forte_life/widgets/pdf/pdf_column.dart';
 import 'package:forte_life/widgets/pdf/pdf_subtitle.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-import 'package:flutter/material.dart' as m;
 import 'dart:io';
 
 class PDFWidget {
   Document createPDF(
-      String title,
-      String lpName,
-      String lpAge,
-      String lpGender,
-      String lpOccupation,
-      String pName,
-      String pAge,
-      String pGender,
-      String pOccupation,
-      String basicSA,
-      String policyTerm,
-      String premium,
-      String premiumRyder,
-      String ryderSA) {
+    String title,
+    bool addRider,
+    bool differentP,
+    String lpName,
+    String lpAge,
+    String lpGender,
+    String lpOccupation,
+    String pName,
+    String pAge,
+    String pGender,
+    String pOccupation,
+    String basicSA,
+    String policyTerm,
+    String paymentMode,
+    String premium,
+    String premiumRider,
+    String riderSA,
+  ) {
     //Final variables
     final file = File(
             "/storage/emulated/0/Android/data/com.reahu.forte_life/files/logo.png")
@@ -48,75 +50,91 @@ class PDFWidget {
 
     //Doubles with no previous values
     double accumulatedPremium = 0;
+    double accumulatedPremiumNoRider = 0;
     double totalSA = 0;
     double allCauses = 0;
     double allAccidents = 0;
     double cashValue = 0;
+    double riderSANum = 0;
+    double premiumRiderNum = 0;
+    double totalPremiumNum = 0;
     //
 
     //Convert String to Double for ease of use
     double basicSANum = double.parse(basicSA);
-    double ryderSANum = double.parse(ryderSA);
     double premiumNum = double.parse(premium);
-    double premiumRyderNum = double.parse(premiumRyder);
     //
 
-    //Calculations
-    double totalPremium = premiumNum + premiumRyderNum;
+    //Doubles with conditions
+    riderSANum = addRider == true ? double.parse(riderSA) : 0;
+    premiumRiderNum = addRider == true ? double.parse(premiumRider) : 0;
     //
 
-    //Round all the doubles to a .00 decimal format
+    // Total premium
+    double totalPremium = premiumNum + premiumRiderNum;
+    //
+
+    // Round all the doubles to a .00 decimal format
     String halfP = (totalPremium * 0.5178).toStringAsFixed(2);
     String quarterlyP = (totalPremium * 0.2635).toStringAsFixed(2);
     String monthlyP = (totalPremium * 0.0888).toStringAsFixed(2);
-    String ryderSAStr = ryderSANum.toStringAsFixed(0);
     String premiumStr = premiumNum.toStringAsFixed(2);
-    String premiumRyderStr = premiumRyderNum.toStringAsFixed(2);
+    String riderSAStr = riderSANum.toStringAsFixed(2);
+    String premiumRiderStr = premiumRiderNum.toStringAsFixed(2);
     String totalPremiumStr = totalPremium.toStringAsFixed(2);
     String accumulatedPremiumStr = totalPremium.toStringAsFixed(2);
+    String cashValueStr = cashValue.toStringAsFixed(2);
+    String accumulatedPremiumNoRiderStr =
+        accumulatedPremiumNoRider.toStringAsFixed(2);
     //
 
     List<List<dynamic>> getDynamicRow(int policyYear, int age) {
       List<List<dynamic>> dynamicRow = List();
       int i = 1;
-      accumulatedPremium += totalPremium;
-      accumulatedPremiumStr = accumulatedPremium.toStringAsFixed(2);
+      double cashValPercentage = 0;
+      totalPremiumNum = (premiumNum + premiumRiderNum);
+      accumulatedPremiumNoRider += premiumNum;
+      accumulatedPremium += totalPremiumNum;
+      //All causes and accidents, List initialization
       switch (age) {
         case 1:
           {
-            allCauses = (basicSANum * 0.6) + ryderSANum;
-            allAccidents = (basicSANum * 1.2) + ryderSANum;
+            allCauses = (basicSANum * 0.6) + riderSANum;
+            allAccidents = (basicSANum * 1.2) + riderSANum;
             dynamicRow = [
               [
-                "     $i     ",
-                "         $totalPremiumStr               $accumulatedPremiumStr     ",
-                "         $allCauses                $allAccidents     ",
-                allAccidents,
+                "$i",
+                "         $totalPremiumStr              $accumulatedPremiumStr     ",
+                "$allCauses $allAccidents",
+                "-",
                 "-"
               ],
             ];
             i++;
-            allCauses = (basicSANum * 0.8) + ryderSANum;
-            allAccidents = (basicSANum * 1.6) + ryderSANum;
+            allCauses = (basicSANum * 0.8) + riderSANum;
+            allAccidents = (basicSANum * 1.6) + riderSANum;
+            accumulatedPremiumNoRider += premiumNum;
+            accumulatedPremium += totalPremiumNum;
             dynamicRow.add([
-              "     $i      ",
+              "$i",
               "         $totalPremiumStr              $accumulatedPremiumStr     ",
               "         $allCauses            $allAccidents     ",
-              allAccidents,
+              "-",
               "-"
             ]);
             break;
           }
         case 2:
           {
-            allCauses = (basicSANum * 0.8) + ryderSANum;
-            allAccidents = (basicSANum * 1.6) + ryderSANum;
+            allCauses = (basicSANum * 0.8) + riderSANum;
+            allAccidents = (basicSANum * 1.6) + riderSANum;
+            accumulatedPremiumNoRider += premiumNum;
             dynamicRow = [
               [
-                "     $i     ",
+                "$i",
                 "         $totalPremiumStr              $accumulatedPremiumStr     ",
                 "         $allCauses            $allAccidents     ",
-                allAccidents,
+                "-",
                 "-"
               ],
             ];
@@ -126,34 +144,58 @@ class PDFWidget {
 
         default:
           {
-            allCauses = basicSANum + ryderSANum;
-            allAccidents = (basicSANum * 2) + ryderSANum;
+            allCauses = basicSANum + riderSANum;
+            allAccidents = (basicSANum * 2) + riderSANum;
             dynamicRow = [
               [
-                "     $i     ",
+                "$i",
                 "         $totalPremiumStr              $accumulatedPremiumStr     ",
                 "         $allCauses            $allAccidents     ",
-                allAccidents,
+                "-",
                 "-"
               ]
             ];
             break;
           }
       }
+      //
       i++;
-      allCauses = basicSANum + ryderSANum;
-      allAccidents = (basicSANum * 2) + ryderSANum;
+      allCauses = basicSANum + riderSANum;
+      allAccidents = (basicSANum * 2) + riderSANum;
       while (i <= policyYear) {
-        accumulatedPremium += totalPremium;
+        accumulatedPremium += totalPremiumNum;
         accumulatedPremiumStr = accumulatedPremium.toStringAsFixed(2);
-        dynamicRow.add([
-          "     $i      ",
-          "         $totalPremiumStr              $accumulatedPremiumStr     ",
-          "         $allCauses            $allAccidents     ",
-          allAccidents,
-          "-"
-        ]);
-        i++;
+        accumulatedPremiumNoRider += premiumNum;
+        if (i >= 3) {
+          if (i <= 16) {
+            if (i <= 12)
+              cashValPercentage += 0.05;
+            else
+              cashValPercentage += 0.1;
+          }
+          cashValue = accumulatedPremiumNoRider * cashValPercentage;
+          cashValueStr = cashValue.toStringAsFixed(2);
+        } else
+          cashValueStr = "-";
+        if (i < policyYear) {
+          dynamicRow.add([
+            "$i",
+            "         $totalPremiumStr              $accumulatedPremiumStr     ",
+            "         $allCauses            $allAccidents     ",
+            cashValueStr,
+            "-"
+          ]);
+          i++;
+        } else {
+          dynamicRow.add([
+            "$i",
+            "         $totalPremiumStr              ${accumulatedPremium.round().toStringAsFixed(2)}     ",
+            "         $allCauses            $allAccidents     ",
+            cashValue.round().toStringAsFixed(2),
+            "-"
+          ]);
+          i++;
+        }
       }
 
       return dynamicRow;
@@ -162,8 +204,8 @@ class PDFWidget {
     List<String> getDynamicHeaders() {
       List<String> dynamicHeader = [
         "End of Policy Year",
-        "                Premium (USD) \n \n    Annualized       Accumulated   ",
-        "          Total Death/TPD (USD) \n \n       All Causes         Accidents    ",
+        "                 Premium (USD) \n \n       Annualized     Accumulated",
+        "             Total Death/TPD (USD) \n \n           All Causes      Accidents    ",
         "Cash Value",
         "Guaranteed Special Benefit"
       ];
@@ -326,7 +368,8 @@ class PDFWidget {
                                                         font: regularF,
                                                         fontSize: 7)))),
                                         PDFSubtitle(
-                                            title: "USD $basicSA",
+                                            title:
+                                                "USD ${basicSANum.toStringAsFixed(2)}",
                                             font: regularF),
                                         Padding(
                                           padding: EdgeInsets.only(left: 2.5),
@@ -341,41 +384,46 @@ class PDFWidget {
                                               font: regularF),
                                         )
                                       ]),
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Padding(
-                                            padding: EdgeInsets.only(left: 5),
-                                            child: Container(
-                                                width: 103.55,
-                                                child: Text(
-                                                    "Rider             : $title" +
-                                                        " Plus",
-                                                    style: TextStyle(
-                                                        font: regularF,
-                                                        fontSize: 7)))),
-                                        PDFSubtitle(
-                                            title: "USD $ryderSAStr",
-                                            font: regularF),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 2.5),
-                                          child: PDFSubtitle(
-                                              title: policyTerm,
-                                              font: regularF),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 2.5),
-                                          child: PDFSubtitle(
-                                              title: policyTerm,
-                                              font: regularF),
-                                        )
-                                      ]),
+                                  addRider == true
+                                      ? Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                              Padding(
+                                                  padding:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: Container(
+                                                      width: 103.55,
+                                                      child: Text(
+                                                          "Rider             : $title" +
+                                                              " Plus",
+                                                          style: TextStyle(
+                                                              font: regularF,
+                                                              fontSize: 7)))),
+                                              PDFSubtitle(
+                                                  title: "USD $riderSAStr",
+                                                  font: regularF),
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(left: 2.5),
+                                                child: PDFSubtitle(
+                                                    title: policyTerm,
+                                                    font: regularF),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(left: 2.5),
+                                                child: PDFSubtitle(
+                                                    title: policyTerm,
+                                                    font: regularF),
+                                              )
+                                            ])
+                                      : SizedBox(height: 0),
                                 ]),
                                 Padding(
                                     padding: EdgeInsets.only(right: 5),
                                     child: PDFSubtitle(
-                                        title: "Yearly", font: regularF)),
+                                        title: paymentMode, font: regularF)),
                               ])
                         ]),
                         TableRow(children: [
@@ -404,13 +452,16 @@ class PDFWidget {
                                               style: TextStyle(
                                                   font: regularF,
                                                   fontSize: 7))),
-                                      Container(
-                                          width: 120,
-                                          child: Text(
-                                              "Rider             : $title" +
-                                                  " Plus",
-                                              style: TextStyle(
-                                                  font: regularF, fontSize: 7)))
+                                      addRider == true
+                                          ? Container(
+                                              width: 120,
+                                              child: Text(
+                                                  "Rider             : $title" +
+                                                      " Plus",
+                                                  style: TextStyle(
+                                                      font: regularF,
+                                                      fontSize: 7)))
+                                          : SizedBox(height: 0)
                                     ])),
                                 Padding(
                                     padding: EdgeInsets.only(left: 50),
@@ -419,7 +470,9 @@ class PDFWidget {
                                           title: "USD $premiumStr",
                                           font: regularF),
                                       PDFSubtitle(
-                                          title: "USD $premiumRyderStr",
+                                          title: addRider == true
+                                              ? "USD $premiumRiderStr"
+                                              : "",
                                           font: regularF),
                                     ]))
                               ]),
@@ -493,7 +546,7 @@ class PDFWidget {
                       cellPadding: EdgeInsets.all(0.75),
                       headerStyle: TextStyle(font: boldF, fontSize: 7),
                       cellStyle: TextStyle(font: regularF, fontSize: 7),
-                      cellAlignment: Alignment.centerLeft,
+                      cellAlignment: Alignment.topCenter,
                       headerDecoration: BoxDecoration(
                           border: Border(
                               right: BorderSide(),
