@@ -6,6 +6,7 @@ import 'package:forte_life/providers/app_provider.dart';
 import 'package:forte_life/providers/parameters_provider.dart';
 import 'package:forte_life/widgets/calculate_button.dart';
 import 'package:forte_life/widgets/custom_datepicker.dart';
+import 'package:forte_life/widgets/custom_dialogtext.dart';
 import 'package:forte_life/widgets/custom_dropdown.dart';
 import 'package:forte_life/widgets/custom_switch.dart';
 import 'package:forte_life/widgets/custom_text_field.dart';
@@ -54,10 +55,29 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
 
   String lSelectedGender;
   String pSelectedGender;
-  int selectedYear = 10;
-  double premiumRider;
   String selectedMode = "Yearly";
+
+  //Necessary error texts
+  bool emptyAgeField = false;
+  bool emptyAgeFieldP = false;
+  bool emptyGenderField = false;
+  bool emptyGenderFieldP = false;
+  bool emptyPremiumField = false;
+  bool emptySumField = false;
+  //
+  //Necessary error variables
+  int counter = 0;
+  //
+  //
+
+  int selectedYear = 10;
+  int parameterCounter = 0;
+
   double premiumNum;
+  double sumAssuredNum;
+  double premiumRider;
+
+  List<Widget> customDialogChildren = List();
 
   List<DropdownMenuItem> genderTypes = [
     DropdownMenuItem(
@@ -71,6 +91,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
         ),
         value: "Female")
   ];
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   List<DropdownMenuItem> paymentMode = [
     DropdownMenuItem(
@@ -118,9 +139,31 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
     ParametersProvider parametersProvider =
         Provider.of<ParametersProvider>(context, listen: false);
     AppProvider appProvider = Provider.of<AppProvider>(context);
-
     final mq = MediaQuery.of(context);
-    final _formKey = GlobalKey<FormState>();
+    showAlertDialog(BuildContext context) {
+      AlertDialog alert = AlertDialog(
+          // contentPadding: EdgeInsets.all(10),
+          title: Center(
+              child: Container(
+                  child: Text(
+            "Error Inputs",
+            style: TextStyle(
+                color: Colors.red,
+                fontFamily: "Kano",
+                fontSize: 12,
+                fontWeight: FontWeight.bold),
+          ))),
+          content: Column(
+              mainAxisSize: MainAxisSize.min, children: customDialogChildren));
+
+      // show the dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
 
     //Derive rate
     Future<void> getRate(bool isMale, int ageParam, int termParam) async {
@@ -175,6 +218,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
         premiumRider =
             (cellResult.value * double.parse(riderAdded.text)) / 1000;
       }
+      counter++;
     }
     //
 
@@ -207,36 +251,32 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
 
     //Calculate and Generate PDF
     void calculateAndPDF() {
-      print(appProvider.differentPerson);
       if (appProvider.differentPerson == false) {
-        setState(() {
-          parametersProvider.pName = parametersProvider.lpName =
-              firstName.text.toString() + " " + lastName.text.toString();
-          parametersProvider.pAge =
-              parametersProvider.lpAge = age.text.toString();
-          parametersProvider.pGender =
-              parametersProvider.lpGender = lSelectedGender.toString();
-          parametersProvider.pOccupation =
-              parametersProvider.lpOccupation = lOccupation.text.toString();
-        });
+        parametersProvider.pName = parametersProvider.lpName =
+            firstName.text.toString() + " " + lastName.text.toString();
+        parametersProvider.pAge =
+            parametersProvider.lpAge = age.text.toString();
+        parametersProvider.pGender =
+            parametersProvider.lpGender = lSelectedGender.toString();
+        parametersProvider.pOccupation =
+            parametersProvider.lpOccupation = lOccupation.text.toString();
       } else {
-        setState(() {
-          //Proposer
-          parametersProvider.pName =
-              pFirstName.text.toString() + " " + pLastName.text.toString();
-          parametersProvider.pAge = pAge.text.toString();
-          parametersProvider.pGender = pSelectedGender.toString();
-          parametersProvider.pOccupation = pOccupation.text.toString();
-          //
+        //Proposer
+        parametersProvider.pName =
+            pFirstName.text.toString() + " " + pLastName.text.toString();
+        parametersProvider.pAge = pAge.text.toString();
+        parametersProvider.pGender = pSelectedGender.toString();
+        parametersProvider.pOccupation = pOccupation.text.toString();
+        //
 
-          //Life Proposed
-          parametersProvider.lpName =
-              lastName.text.toString() + " " + firstName.text.toString();
-          parametersProvider.lpAge = age.text.toString();
-          parametersProvider.lpGender = lSelectedGender.toString();
-          parametersProvider.lpOccupation = lOccupation.text.toString();
-          //
-        });
+        //Life Proposed
+        parametersProvider.lpName =
+            lastName.text.toString() + " " + firstName.text.toString();
+        parametersProvider.lpAge = age.text.toString();
+        parametersProvider.lpGender = lSelectedGender.toString();
+        parametersProvider.lpOccupation = lOccupation.text.toString();
+        //
+
       }
 
       if (appProvider.addRider == true) {
@@ -252,7 +292,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
 
       parametersProvider.policyTerm = selectedYear.toString();
       parametersProvider.annualP = premiumNum.toString();
-      parametersProvider.basicSA = sumAssured.text.toString();
+      parametersProvider.basicSA = sumAssuredNum.toString();
       appProvider.activeTabIndex = 1;
       Navigator.of(context).pushNamed("/main_flow");
     }
@@ -264,24 +304,23 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
         child: Container(
           padding: EdgeInsets.symmetric(
               horizontal: 20, vertical: mq.size.height / 9.5),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomSwitch(
-                value: appProvider.differentPerson,
-                title: "Buying For Someone Else",
-                onChanged: (bool) {
-                  setState(() {
-                    appProvider.differentPerson = bool;
-                  });
-                },
-              ),
-              Visibility(
-                child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5),
-                    child: Form(
-                      key: _formKey,
-                      autovalidateMode: AutovalidateMode.always,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomSwitch(
+                  value: appProvider.differentPerson,
+                  title: "Buying For Someone Else",
+                  onChanged: (bool) {
+                    setState(() {
+                      appProvider.differentPerson = bool;
+                    });
+                  },
+                ),
+                Visibility(
+                  child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -300,6 +339,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                       formLabel: "First Name",
                                       formInputType: TextInputType.name,
                                       formController: pFirstName,
+                                      errorVisible: false,
                                     ),
                                   ),
                                   SizedBox(width: 5),
@@ -308,13 +348,12 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                       formLabel: "Last Name",
                                       formInputType: TextInputType.name,
                                       formController: pLastName,
-                                      onChange: (value) async {},
+                                      errorVisible: false,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            SizedBox(height: 5),
                             Container(
                               width: mq.size.width,
                               child: Row(
@@ -325,6 +364,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                       flex: 1,
                                       child: AgeField(
                                         formController: pAge,
+                                        errorVisible: false,
                                       )),
                                   SizedBox(width: 5),
                                   Expanded(
@@ -344,11 +384,13 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                               child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Expanded(
                                         child: CustomDropDown(
                                       title: "Gender",
                                       value: pSelectedGender,
+                                      errorVisible: emptyGenderFieldP,
                                       items: genderTypes,
                                       onChange: (value) {
                                         setState(() {
@@ -363,299 +405,355 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                         formInputType: TextInputType.text,
                                         formLabel: "Occupation",
                                         formController: pOccupation,
+                                        errorVisible: false,
                                       ),
                                     )
                                   ]),
                             )
-                          ]),
-                    )),
-                visible: appProvider.differentPerson,
-              ),
-              SizedBox(height: 15),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FieldTitle(
-                      fieldTitle: "Life Proposed",
-                    ),
-                    SizedBox(height: 10),
-                    Container(
-                      width: mq.size.width,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: CustomTextField(
-                              formLabel: "First Name",
-                              formInputType: TextInputType.name,
-                              formController: firstName,
-                            ),
-                          ),
-                          SizedBox(width: 5),
-                          Expanded(
-                            child: CustomTextField(
-                              formLabel: "Last Name",
-                              formInputType: TextInputType.name,
-                              formController: lastName,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Container(
-                      width: mq.size.width,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                              flex: 1,
-                              child: AgeField(
-                                formController: age,
-                              )),
-                          SizedBox(width: 5),
-                          Expanded(
-                              flex: 2,
-                              child: CustomDatePicker(
-                                focusNode: AlwaysDisabledFocusNode(),
-                                dob: dob,
-                                onTap: () {
-                                  _selectDate(context, dob, age);
-                                },
-                              )),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Container(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                              child: CustomDropDown(
-                            title: "Gender",
-                            value: lSelectedGender,
-                            items: genderTypes,
-                            onChange: (value) {
-                              setState(() {
-                                lSelectedGender = value;
-                              });
-                            },
-                          )),
-                          SizedBox(width: 5),
-                          Expanded(
-                            flex: 2,
-                            child: CustomTextField(
-                              formInputType: TextInputType.text,
-                              formLabel: "Occupation",
-                              formController: lOccupation,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Container(
-                      width: mq.size.width,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: CustomDropDown(
-                              title: "Payment Mode",
-                              value: selectedMode,
-                              items: paymentMode,
-                              onChange: (value) {
-                                setState(() {
-                                  selectedMode = value;
-                                  if ((premium.text.isNotEmpty ||
-                                          sumAssured.text.isNotEmpty) &&
-                                      (selectedYear != null)) {
-                                    if (premium.text.isNotEmpty) {
-                                      sumAssured.text = ((((double.parse(
-                                                          premium.text) /
-                                                      (paymentModeValue(
-                                                              selectedMode)[1] *
-                                                          paymentModeValue(
-                                                                  selectedMode)[
-                                                              0])) *
-                                                  selectedYear.toDouble())) *
-                                              paymentModeValue(selectedMode)[0])
-                                          .toStringAsFixed(2);
-                                    } else if (sumAssured.text.isNotEmpty) {
-                                      premiumNum =
-                                          (double.parse(sumAssured.text) /
-                                                  selectedYear.toDouble()) *
-                                              paymentModeValue(selectedMode)[1];
-                                      premium.text =
-                                          premiumNum.toStringAsFixed(2);
-                                    }
-                                  }
-                                });
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 5),
-                          Expanded(
-                            flex: 1,
-                            child: CustomDropDown(
-                              title: "Policy Year",
-                              value: selectedYear,
-                              items: policyYears,
-                              onChange: (value) {
-                                setState(() {
-                                  selectedYear = value;
-                                  if ((premium.text.isNotEmpty ||
-                                          sumAssured.text.isNotEmpty) &&
-                                      selectedMode.isNotEmpty) {
-                                    if (premium.text.isNotEmpty) {
-                                      sumAssured.text = ((((double.parse(
-                                                          premium.text) /
-                                                      (paymentModeValue(
-                                                              selectedMode)[1] *
-                                                          paymentModeValue(
-                                                                  selectedMode)[
-                                                              0])) *
-                                                  selectedYear.toDouble())) *
-                                              paymentModeValue(selectedMode)[0])
-                                          .toStringAsFixed(2);
-                                    } else if (sumAssured.text.isNotEmpty) {
-                                      premiumNum =
-                                          (double.parse(sumAssured.text) /
-                                                  selectedYear.toDouble()) *
-                                              paymentModeValue(selectedMode)[1];
-                                      premium.text =
-                                          premiumNum.toStringAsFixed(2);
-                                    }
-                                  }
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    CustomTextField(
-                      formLabel: "Premium Payable",
-                      formInputType: TextInputType.number,
-                      formController: premium,
-                      onChange: (text) {
-                        if (selectedYear != null) {
-                          if (text == "") {
-                            sumAssured.text = "";
-                          } else
-                            sumAssured.text = ((((double.parse(text) /
-                                                (paymentModeValue(
-                                                        selectedMode)[1] *
-                                                    paymentModeValue(
-                                                        selectedMode)[0])) *
-                                            selectedYear.toDouble())
-                                        .round()) *
-                                    paymentModeValue(selectedMode)[0])
-                                .toStringAsFixed(2);
-                        } else {
-                          sumAssured.text = null;
-                        }
-                      },
-                    ),
-                    SizedBox(height: 5),
-                    CustomTextField(
-                      formLabel: "Sum Assured",
-                      formInputType: TextInputType.number,
-                      formController: sumAssured,
-                      onChange: (text) {
-                        if (selectedYear != null) {
-                          if (text == "") {
-                            premium.text = "";
-                          } else
-                            premiumNum = ((double.parse(text) /
-                                    selectedYear.toDouble()) *
-                                paymentModeValue(selectedMode)[1]);
-                          premium.text = premiumNum.toStringAsFixed(2);
-                        } else {
-                          premium.text = null;
-                        }
-                      },
-                    ),
-                  ],
+                          ])),
+                  visible: appProvider.differentPerson,
                 ),
-              ),
-              CustomSwitch(
-                value: appProvider.addRider,
-                title: "Add Rider",
-                onChanged: (bool) {
-                  setState(() {
-                    appProvider.addRider = bool;
-                  });
-                },
-              ),
-              Visibility(
-                  visible: appProvider.addRider,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
-                    child: CustomTextField(
-                      formInputType: TextInputType.number,
-                      formLabel: "Added Rider",
-                      formController: riderAdded,
-                    ),
-                  )),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5),
-                    child: CalculateButton(
-                      onPressed: () async {
-                        if (appProvider.addRider == true) {
-                          await getRate(
-                              true, int.parse(age.text), selectedYear);
-                          calculateAndPDF();
-                        } else
-                          calculateAndPDF();
-                      },
-                    ),
-                  ),
-                  Padding(
-                      padding: EdgeInsets.all(5),
-                      child: ResetButton(
-                        onPressed: () {
-                          //Proposer
-                          pFirstName.clear();
-                          pLastName.clear();
-                          pAge.clear();
-                          pDob.clear();
-                          pGender.clear();
-                          pOccupation.clear();
-                          //
-
-                          //Life Proposed
-                          firstName.clear();
-                          lastName.clear();
-                          age.clear();
-                          dob.clear();
-                          sumAssured.clear();
-                          premium.clear();
-                          gender.clear();
-                          lOccupation.clear();
-                          policyYear.clear();
-
-                          riderAdded.clear();
-
-                          lSelectedGender = null;
-                          pSelectedGender = null;
-                          selectedYear = 0;
+                SizedBox(height: 15),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      FieldTitle(
+                        fieldTitle: "Life Proposed",
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                        width: mq.size.width,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: CustomTextField(
+                                formLabel: "First Name",
+                                formInputType: TextInputType.name,
+                                formController: firstName,
+                                errorVisible: false,
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                            Expanded(
+                              child: CustomTextField(
+                                formLabel: "Last Name",
+                                formInputType: TextInputType.name,
+                                formController: lastName,
+                                errorVisible: false,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: mq.size.width,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                                flex: 1,
+                                child: AgeField(
+                                  formController: age,
+                                  errorVisible: emptyAgeField,
+                                )),
+                            SizedBox(width: 5),
+                            Expanded(
+                                flex: 2,
+                                child: CustomDatePicker(
+                                  focusNode: AlwaysDisabledFocusNode(),
+                                  dob: dob,
+                                  onTap: () {
+                                    _selectDate(context, dob, age);
+                                  },
+                                )),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                                child: CustomDropDown(
+                              title: "Gender",
+                              value: lSelectedGender,
+                              items: genderTypes,
+                              errorVisible: emptyGenderField,
+                              onChange: (value) {
+                                setState(() {
+                                  lSelectedGender = value;
+                                });
+                              },
+                            )),
+                            SizedBox(width: 5),
+                            Expanded(
+                              flex: 2,
+                              child: CustomTextField(
+                                formInputType: TextInputType.text,
+                                formLabel: "Occupation",
+                                formController: lOccupation,
+                                errorVisible: false,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: mq.size.width,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: CustomDropDown(
+                                title: "Payment Mode",
+                                value: selectedMode,
+                                errorVisible: false,
+                                items: paymentMode,
+                                onChange: (value) {
+                                  setState(() {
+                                    selectedMode = value;
+                                    if ((premium.text.isNotEmpty ||
+                                            sumAssured.text.isNotEmpty) &&
+                                        (selectedYear != null)) {
+                                      if (premium.text.isNotEmpty) {
+                                        premiumNum = double.parse(premium.text);
+                                        sumAssured.text = ((((double.parse(
+                                                            premium.text) /
+                                                        (paymentModeValue(
+                                                                    selectedMode)[
+                                                                1] *
+                                                            paymentModeValue(
+                                                                    selectedMode)[
+                                                                0])) *
+                                                    selectedYear.toDouble())) *
+                                                paymentModeValue(
+                                                    selectedMode)[0])
+                                            .toStringAsFixed(2);
+                                      } else if (sumAssured.text.isNotEmpty) {
+                                        premiumNum = (double.parse(
+                                                    sumAssured.text) /
+                                                selectedYear.toDouble()) *
+                                            paymentModeValue(selectedMode)[1];
+                                        premium.text =
+                                            premiumNum.toStringAsFixed(2);
+                                      }
+                                    }
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                            Expanded(
+                              flex: 1,
+                              child: CustomDropDown(
+                                title: "Policy Year",
+                                value: selectedYear,
+                                items: policyYears,
+                                errorVisible: false,
+                                onChange: (value) {
+                                  setState(() {
+                                    selectedYear = value;
+                                    if ((premium.text.isNotEmpty ||
+                                            sumAssured.text.isNotEmpty) &&
+                                        selectedMode.isNotEmpty) {
+                                      if (premium.text.isNotEmpty) {
+                                        premiumNum = double.parse(premium.text);
+                                        sumAssured.text = ((((double.parse(
+                                                            premium.text) /
+                                                        (paymentModeValue(
+                                                                    selectedMode)[
+                                                                1] *
+                                                            paymentModeValue(
+                                                                    selectedMode)[
+                                                                0])) *
+                                                    selectedYear.toDouble())) *
+                                                paymentModeValue(
+                                                    selectedMode)[0])
+                                            .toStringAsFixed(2);
+                                      } else if (sumAssured.text.isNotEmpty) {
+                                        premiumNum = (double.parse(
+                                                    sumAssured.text) /
+                                                selectedYear.toDouble()) *
+                                            paymentModeValue(selectedMode)[1];
+                                        premium.text =
+                                            premiumNum.toStringAsFixed(2);
+                                      }
+                                    }
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      CustomTextField(
+                        formLabel: "Premium Payable",
+                        formInputType: TextInputType.number,
+                        formController: premium,
+                        errorVisible: emptyPremiumField,
+                        onChange: (text) {
+                          if (selectedYear != null) {
+                            if (text == "") {
+                              sumAssured.text = "";
+                            } else
+                              sumAssured.text = ((((double.parse(text) /
+                                              (paymentModeValue(
+                                                      selectedMode)[1] *
+                                                  paymentModeValue(
+                                                      selectedMode)[0])) *
+                                          selectedYear.toDouble())) *
+                                      paymentModeValue(selectedMode)[0])
+                                  .toStringAsFixed(2);
+                            premiumNum = double.parse(text);
+                            sumAssuredNum = double.parse(sumAssured.text);
+                          } else {
+                            sumAssured.text = null;
+                          }
                         },
-                      ))
-                ],
-              )
-            ],
+                      ),
+                      CustomTextField(
+                        formLabel: "Sum Assured",
+                        formInputType: TextInputType.number,
+                        formController: sumAssured,
+                        errorVisible: emptySumField,
+                        onChange: (text) {
+                          if (selectedYear != null) {
+                            if (text == "") {
+                              premium.text = "";
+                            } else
+                              premiumNum = ((double.parse(text) /
+                                      selectedYear.toDouble()) *
+                                  paymentModeValue(selectedMode)[1]);
+                            premium.text = premiumNum.toStringAsFixed(2);
+                            sumAssuredNum = double.parse(text);
+                            premiumNum = double.parse(premium.text);
+                          } else {
+                            premium.text = null;
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                CustomSwitch(
+                  value: appProvider.addRider,
+                  title: "Add Rider",
+                  onChanged: (bool) {
+                    setState(() {
+                      appProvider.addRider = bool;
+                    });
+                  },
+                ),
+                Visibility(
+                    visible: appProvider.addRider,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
+                      child: CustomTextField(
+                        formInputType: TextInputType.number,
+                        formLabel: "Added Rider",
+                        formController: riderAdded,
+                        errorVisible: false,
+                      ),
+                    )),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5),
+                      child: CalculateButton(onPressed: () async {
+                        if (formValidation()) {
+                          counter = 0;
+                          customDialogChildren.clear();
+                          _formKey.currentState.save();
+                          if (appProvider.differentPerson == true) {
+                            sumAssuredValidation(sumAssured.text);
+                            premiumValidation(premium.text);
+                            ageValidation(
+                                age.text, pAge.text, selectedYear, true);
+                            if (counter == 2) {
+                              if (appProvider.addRider) {
+                                await getRate(isMale(pSelectedGender),
+                                    int.parse(age.text), selectedYear);
+                                calculateAndPDF();
+                              } else
+                                calculateAndPDF();
+                            } else
+                              showAlertDialog(context);
+                          } else {
+                            sumAssuredValidation(sumAssured.text);
+                            premiumValidation(premium.text);
+                            ageValidation(
+                                age.text, pAge.text, selectedYear, false);
+                            print(appProvider.addRider);
+                            if (counter >= 3) {
+                              if (appProvider.addRider) {
+                                addedRiderValidation(
+                                    riderAdded.text, sumAssured.text);
+                                genderValidation(lSelectedGender);
+                                print(counter);
+                                if (counter == 5) {
+                                  await getRate(isMale(lSelectedGender),
+                                      int.parse(age.text), selectedYear);
+                                  calculateAndPDF();
+                                } else
+                                  showAlertDialog(context);
+                              } else {
+                                calculateAndPDF();
+                              }
+                            } else
+                              showAlertDialog(context);
+                          }
+                        } else {
+                          customDialogChildren.add(CustomDialogText(
+                            description: "No Inputs",
+                          ));
+                          showAlertDialog(context);
+                        }
+                      }),
+                    ),
+                    Padding(
+                        padding: EdgeInsets.all(5),
+                        child: ResetButton(
+                          onPressed: () {
+                            //Proposer
+                            pFirstName.clear();
+                            pLastName.clear();
+                            pAge.clear();
+                            pDob.clear();
+                            pGender.clear();
+                            pOccupation.clear();
+                            //
+
+                            //Life Proposed
+                            firstName.clear();
+                            lastName.clear();
+                            age.clear();
+                            dob.clear();
+                            sumAssured.clear();
+                            premium.clear();
+                            gender.clear();
+                            lOccupation.clear();
+                            policyYear.clear();
+
+                            riderAdded.clear();
+
+                            lSelectedGender = null;
+                            pSelectedGender = null;
+                            selectedYear = 0;
+                          },
+                        ))
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -668,15 +766,15 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
     DateTime newSelectedDate = await showDatePicker(
         context: context,
         initialDate: _selectedDate != null ? _selectedDate : DateTime.now(),
-        firstDate: DateTime(1900),
-        lastDate: DateTime(2040),
+        firstDate: DateTime(1940),
+        lastDate: DateTime.now(),
         builder: (BuildContext context, Widget child) {
           return Theme(
             data: ThemeData.dark().copyWith(
               colorScheme: ColorScheme.light(
-                primary: Colors.blueAccent,
+                primary: Color(0xFF8AB84B),
                 onPrimary: Colors.white,
-                surface: Colors.blueAccent,
+                surface: Color(0xFF8AB84B),
                 onSurface: Colors.black,
               ),
               dialogBackgroundColor: Colors.white,
@@ -716,18 +814,151 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   }
   //
 
-  //Validation
-
   //Convert DateTime format to Date form
   String convertDateTimeDisplay(String date) {
-    final DateFormat displayFormater = DateFormat('yyyy-MM-dd HH:mm:ss.SSS');
-    final DateFormat serverFormater = DateFormat('dd-MM-yyyy');
-    final DateTime displayDate = displayFormater.parse(date);
-    final String formatted = serverFormater.format(displayDate);
+    final DateFormat displayFormatter = DateFormat('yyyy-MM-dd HH:mm:ss.SSS');
+    final DateFormat serverFormatter = DateFormat('dd-MM-yyyy');
+    final DateTime displayDate = displayFormatter.parse(date);
+    final String formatted = serverFormatter.format(displayDate);
     return formatted;
   }
   //
 
+  //Validate Age
+  void ageValidation(
+      String ageText, String pAgeText, int policyTerm, bool isDifferentPerson) {
+    if (isDifferentPerson == false) {
+      if ((int.parse(ageText) + policyTerm) >= 69) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Age limit exceeded, please check information page.",
+        ));
+      } else if (int.parse(ageText) < 18) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Age under 18, please check information page",
+        ));
+      } else {
+        counter++;
+      }
+    } else {
+      if (((int.parse(pAgeText) + policyTerm) >= 69) ||
+          (int.parse(pAgeText) < 18) ||
+          (int.parse(ageText) < 1)) {
+        if ((int.parse(pAgeText) + policyTerm) >= 69) {
+          customDialogChildren.add(CustomDialogText(
+            description: "Age limit exceeded, please check information page.",
+          ));
+        } else
+          customDialogChildren.clear();
+        if (int.parse(pAgeText) < 18) {
+          customDialogChildren.add(CustomDialogText(
+            description: "Age under 18, please check information page",
+          ));
+        } else
+          customDialogChildren.clear();
+        if (int.parse(ageText) < 1) {
+          customDialogChildren.add(CustomDialogText(
+            description: "Child's age must be at least 1 year old",
+          ));
+        } else
+          customDialogChildren.clear();
+      } else {
+        counter += 2;
+      }
+    }
+  }
+  //
+
+  //Validate Added Rider
+  void addedRiderValidation(String riderAmount, String sumAssuredAmount) {
+    if (double.parse(riderAmount) < 3600) {
+      customDialogChildren.add(CustomDialogText(
+        description: "Rider must be at least 3600 USD",
+      ));
+    } else if (double.parse(riderAmount) >
+        (double.parse(sumAssuredAmount) * 5)) {
+      customDialogChildren.add(CustomDialogText(
+        description:
+            "Rider is currently limited, please check information page",
+      ));
+    } else
+      counter++;
+  }
+  //
+
+  //Validate Sum Assured
+  void sumAssuredValidation(String sumAssuredAmount) {
+    if (double.parse(sumAssuredAmount) < 2400) {
+      customDialogChildren.add(CustomDialogText(
+        description: "Sum Assured must be at least 2400 USD",
+      ));
+    } else
+      counter++;
+  }
+  //
+
+  //Validate Sum Assured
+  void premiumValidation(String premiumAmount) {
+    if (double.parse(premiumAmount) < 240) {
+      customDialogChildren.add(CustomDialogText(
+        description: "Premium must be at least 240 USD",
+      ));
+    } else {
+      counter++;
+    }
+  }
+  //
+
+  //Gender Emptiness Validation
+  void genderValidation(String genderText) {
+    if (genderText.isNotEmpty) counter++;
+  }
+
+  //
+  //Validate Gender
+  bool isMale(String selectedGender) {
+    if (selectedGender == "Male") {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  //
+
+  // bool validateEmptiness(bool isDifferentPerson) {
+  //   bool noEmptyField = false;
+  //   if (isDifferentPerson) {
+  //     if (premium.text.isEmpty ||
+  //         sumAssured.text.isEmpty ||
+  //         age.text.isEmpty ||
+  //         pAge.text.isEmpty ||
+  //         lSelectedGender.isEmpty ||
+  //         pSelectedGender.isEmpty) {
+  //       if (premium.text.isEmpty) emptyPremiumField = true;
+  //       if (sumAssured.text.isEmpty) emptySumField = true;
+  //       if (age.text.isEmpty) emptyAgeField = true;
+  //       if (pAge.text.isEmpty) emptyAgeFieldP = true;
+  //     } else
+  //       noEmptyField = true;
+  //   } else {
+  //     if (premium.text.isEmpty || sumAssured.text.isEmpty || age.text.isEmpty) {
+  //       if (premium.text.isEmpty) emptyPremiumField = true;
+  //       if (sumAssured.text.isEmpty) emptySumField = true;
+  //       if (age.text.isEmpty) emptyAgeField = true;
+  //       if (pAge.text.isEmpty) emptyAgeFieldP = true;
+  //     } else
+  //       noEmptyField = true;
+  //   }
+  //   return noEmptyField;
+  // }
+
+  //Form Validation
+  bool formValidation() {
+    if (_formKey.currentState.validate()) {
+      return true;
+    } else
+      return false;
+  }
+  //
 }
 
 class AlwaysDisabledFocusNode extends FocusNode {
