@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class UserNameField extends StatelessWidget {
-  UserNameField({this.hintText});
+  UserNameField({this.hintText, this.tec});
 
   final String hintText;
+  final TextEditingController tec;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +22,7 @@ class UserNameField extends StatelessWidget {
             ]),
         child: TextField(
           keyboardType: TextInputType.name,
+          controller: tec,
           decoration: InputDecoration(
             border: InputBorder.none,
             focusedBorder: InputBorder.none,

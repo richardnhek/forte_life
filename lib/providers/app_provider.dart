@@ -34,6 +34,26 @@ class AppProvider extends ChangeNotifier {
   }
   //
 
+  // Switch between info and calculator
+  int _calculationPageEdu = 0;
+  int get calculationPageEdu => _calculationPageEdu;
+
+  set calculationPageEdu(int i) {
+    _calculationPageEdu = i;
+    notifyListeners();
+  }
+  //
+
+  // PDF screen index
+  int _pdfScreenIndex = 0;
+  int get pdfScreenIndex => _pdfScreenIndex;
+
+  set pdfScreenIndex(int i) {
+    _pdfScreenIndex = i;
+    notifyListeners();
+  }
+  //
+
   // Add Rider
   bool _addRider = false;
   bool get addRider => _addRider;

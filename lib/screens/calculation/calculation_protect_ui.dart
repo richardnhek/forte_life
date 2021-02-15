@@ -142,19 +142,30 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
     final mq = MediaQuery.of(context);
     showAlertDialog(BuildContext context) {
       AlertDialog alert = AlertDialog(
-          // contentPadding: EdgeInsets.all(10),
-          title: Center(
-              child: Container(
-                  child: Text(
-            "Error Inputs",
-            style: TextStyle(
-                color: Colors.red,
-                fontFamily: "Kano",
-                fontSize: 12,
-                fontWeight: FontWeight.bold),
-          ))),
-          content: Column(
-              mainAxisSize: MainAxisSize.min, children: customDialogChildren));
+        contentPadding: EdgeInsets.only(top: 25, left: 10, right: 10),
+        title: Center(
+            child: Container(
+                child: Text(
+          "Error Inputs",
+          style: TextStyle(
+              color: Colors.red,
+              fontFamily: "Kano",
+              fontSize: 16,
+              fontWeight: FontWeight.bold),
+        ))),
+        content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: customDialogChildren),
+        actions: [
+          FlatButton(
+            child: Text("OK"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          )
+        ],
+      );
 
       // show the dialog
       showDialog(
@@ -669,47 +680,67 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 5),
                       child: CalculateButton(onPressed: () async {
-                        if (formValidation()) {
+                        if (_formKey.currentState.validate()) {
                           counter = 0;
                           customDialogChildren.clear();
                           _formKey.currentState.save();
                           if (appProvider.differentPerson == true) {
-                            sumAssuredValidation(sumAssured.text);
-                            premiumValidation(premium.text);
-                            ageValidation(
-                                age.text, pAge.text, selectedYear, true);
-                            if (counter == 2) {
-                              if (appProvider.addRider) {
+                            if (appProvider.addRider) {
+                              sumAssuredValidation(
+                                  sumAssured.text, selectedYear);
+                              premiumValidation(premium.text);
+                              ageValidation(
+                                  age.text, pAge.text, selectedYear, true);
+                              addedRiderValidation(
+                                  riderAdded.text, sumAssured.text);
+                              genderValidation(pSelectedGender);
+                              print(counter);
+                              if (counter == 6) {
                                 await getRate(isMale(pSelectedGender),
+                                    int.parse(pAge.text), selectedYear);
+                                calculateAndPDF();
+                              } else
+                                showAlertDialog(context);
+                            } else {
+                              sumAssuredValidation(
+                                  sumAssured.text, selectedYear);
+                              premiumValidation(premium.text);
+                              ageValidation(
+                                  age.text, pAge.text, selectedYear, true);
+                              if (counter == 4) {
+                                calculateAndPDF();
+                              } else
+                                showAlertDialog(context);
+                            }
+                          } else {
+                            if (appProvider.addRider) {
+                              sumAssuredValidation(
+                                  sumAssured.text, selectedYear);
+                              premiumValidation(premium.text);
+                              ageValidation(
+                                  age.text, pAge.text, selectedYear, false);
+                              addedRiderValidation(
+                                  riderAdded.text, sumAssured.text);
+                              genderValidation(lSelectedGender);
+                              print(lSelectedGender);
+                              if (counter == 5) {
+                                await getRate(isMale(lSelectedGender),
                                     int.parse(age.text), selectedYear);
                                 calculateAndPDF();
                               } else
+                                showAlertDialog(context);
+                            } else {
+                              sumAssuredValidation(
+                                  sumAssured.text, selectedYear);
+                              premiumValidation(premium.text);
+                              ageValidation(
+                                  age.text, pAge.text, selectedYear, false);
+                              print(counter);
+                              if (counter == 3) {
                                 calculateAndPDF();
-                            } else
-                              showAlertDialog(context);
-                          } else {
-                            sumAssuredValidation(sumAssured.text);
-                            premiumValidation(premium.text);
-                            ageValidation(
-                                age.text, pAge.text, selectedYear, false);
-                            print(appProvider.addRider);
-                            if (counter >= 3) {
-                              if (appProvider.addRider) {
-                                addedRiderValidation(
-                                    riderAdded.text, sumAssured.text);
-                                genderValidation(lSelectedGender);
-                                print(counter);
-                                if (counter == 5) {
-                                  await getRate(isMale(lSelectedGender),
-                                      int.parse(age.text), selectedYear);
-                                  calculateAndPDF();
-                                } else
-                                  showAlertDialog(context);
-                              } else {
-                                calculateAndPDF();
-                              }
-                            } else
-                              showAlertDialog(context);
+                              } else
+                                showAlertDialog(context);
+                            }
                           }
                         } else {
                           customDialogChildren.add(CustomDialogText(
@@ -828,41 +859,50 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   void ageValidation(
       String ageText, String pAgeText, int policyTerm, bool isDifferentPerson) {
     if (isDifferentPerson == false) {
-      if ((int.parse(ageText) + policyTerm) >= 69) {
+      if (ageText.isEmpty) {
         customDialogChildren.add(CustomDialogText(
-          description: "Age limit exceeded, please check information page.",
-        ));
-      } else if (int.parse(ageText) < 18) {
-        customDialogChildren.add(CustomDialogText(
-          description: "Age under 18, please check information page",
+          description: "Age field can't be empty",
         ));
       } else {
-        counter++;
-      }
-    } else {
-      if (((int.parse(pAgeText) + policyTerm) >= 69) ||
-          (int.parse(pAgeText) < 18) ||
-          (int.parse(ageText) < 1)) {
-        if ((int.parse(pAgeText) + policyTerm) >= 69) {
+        if ((int.parse(ageText) + policyTerm) > 69) {
           customDialogChildren.add(CustomDialogText(
             description: "Age limit exceeded, please check information page.",
           ));
-        } else
-          customDialogChildren.clear();
-        if (int.parse(pAgeText) < 18) {
+        } else if (int.parse(ageText) < 18) {
           customDialogChildren.add(CustomDialogText(
             description: "Age under 18, please check information page",
           ));
-        } else
-          customDialogChildren.clear();
-        if (int.parse(ageText) < 1) {
-          customDialogChildren.add(CustomDialogText(
-            description: "Child's age must be at least 1 year old",
-          ));
-        } else
-          customDialogChildren.clear();
+        } else {
+          counter++;
+        }
+      }
+    } else {
+      if (ageText.isEmpty || pAgeText.isEmpty) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Age field can't be empty",
+        ));
       } else {
-        counter += 2;
+        if (((int.parse(pAgeText) + policyTerm) > 69) ||
+            (int.parse(pAgeText) < 18) ||
+            (int.parse(ageText) < 1)) {
+          if ((int.parse(pAgeText) + policyTerm) > 69) {
+            customDialogChildren.add(CustomDialogText(
+              description: "Age limit exceeded, please check information page.",
+            ));
+          }
+          if (int.parse(pAgeText) < 18) {
+            customDialogChildren.add(CustomDialogText(
+              description: "Age under 18, please check information page",
+            ));
+          }
+          if (int.parse(ageText) < 1) {
+            customDialogChildren.add(CustomDialogText(
+              description: "Child's age must be at least 1 year old",
+            ));
+          }
+        } else {
+          counter += 2;
+        }
       }
     }
   }
@@ -870,35 +910,111 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
 
   //Validate Added Rider
   void addedRiderValidation(String riderAmount, String sumAssuredAmount) {
-    if (double.parse(riderAmount) < 3600) {
+    if (riderAmount.isEmpty) {
       customDialogChildren.add(CustomDialogText(
-        description: "Rider must be at least 3600 USD",
+        description: "Rider can't be empty",
       ));
-    } else if (double.parse(riderAmount) >
-        (double.parse(sumAssuredAmount) * 5)) {
-      customDialogChildren.add(CustomDialogText(
-        description:
-            "Rider is currently limited, please check information page",
-      ));
-    } else
-      counter++;
+    } else {
+      if (double.parse(riderAmount) < 3600) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Rider must be at least 3600 USD",
+        ));
+      } else if (double.parse(riderAmount) >
+          (double.parse(sumAssuredAmount) * 5)) {
+        customDialogChildren.add(CustomDialogText(
+          description:
+              "Rider is currently limited, please check information page",
+        ));
+      } else
+        counter++;
+    }
   }
   //
 
   //Validate Sum Assured
-  void sumAssuredValidation(String sumAssuredAmount) {
-    if (double.parse(sumAssuredAmount) < 2400) {
+  void sumAssuredValidation(String sumAssuredAmount, int policyTerm) {
+    if (sumAssuredAmount.isEmpty) {
       customDialogChildren.add(CustomDialogText(
-        description: "Sum Assured must be at least 2400 USD",
+        description: "Sum Assured can't be empty",
       ));
-    } else
-      counter++;
+    } else {
+      switch (policyTerm) {
+        case 10:
+          {
+            if (double.parse(sumAssuredAmount) < 2400) {
+              customDialogChildren.add(CustomDialogText(
+                description: "Sum Assured must be at least 2400 USD",
+              ));
+            } else
+              counter++;
+            break;
+          }
+        case 15:
+          {
+            if (double.parse(sumAssuredAmount) < 3600) {
+              customDialogChildren.add(CustomDialogText(
+                description: "Sum Assured must be at least 3600 USD",
+              ));
+            } else
+              counter++;
+
+            break;
+          }
+        case 20:
+          {
+            if (double.parse(sumAssuredAmount) < 4800) {
+              customDialogChildren.add(CustomDialogText(
+                description: "Sum Assured must be at least 4800 USD",
+              ));
+            } else
+              counter++;
+            break;
+          }
+        case 25:
+          {
+            if (double.parse(sumAssuredAmount) < 6000) {
+              customDialogChildren.add(CustomDialogText(
+                description: "Sum Assured must be at least 6000 USD",
+              ));
+            } else
+              counter++;
+
+            break;
+          }
+        case 30:
+          {
+            if (double.parse(sumAssuredAmount) < 7200) {
+              customDialogChildren.add(CustomDialogText(
+                description: "Sum Assured must be at least 7200 USD",
+              ));
+            } else
+              counter++;
+
+            break;
+          }
+        case 35:
+          {
+            if (double.parse(sumAssuredAmount) < 8400) {
+              customDialogChildren.add(CustomDialogText(
+                description: "Sum Assured must be at least 8400 USD",
+              ));
+            } else
+              counter++;
+
+            break;
+          }
+      }
+    }
   }
   //
 
   //Validate Sum Assured
   void premiumValidation(String premiumAmount) {
-    if (double.parse(premiumAmount) < 240) {
+    if (premiumAmount.isEmpty) {
+      customDialogChildren.add(CustomDialogText(
+        description: "Premium can't be empty",
+      ));
+    } else if (double.parse(premiumAmount) < 240) {
       customDialogChildren.add(CustomDialogText(
         description: "Premium must be at least 240 USD",
       ));
@@ -908,9 +1024,18 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   }
   //
 
+  Future<bool> getAddRider(bool isAddRider) async {
+    return isAddRider;
+  }
+
   //Gender Emptiness Validation
   void genderValidation(String genderText) {
-    if (genderText.isNotEmpty) counter++;
+    if (genderText == null) {
+      customDialogChildren.add(CustomDialogText(
+        description: "Gender field can't be empty",
+      ));
+    } else
+      counter++;
   }
 
   //
@@ -924,41 +1049,6 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   }
   //
 
-  // bool validateEmptiness(bool isDifferentPerson) {
-  //   bool noEmptyField = false;
-  //   if (isDifferentPerson) {
-  //     if (premium.text.isEmpty ||
-  //         sumAssured.text.isEmpty ||
-  //         age.text.isEmpty ||
-  //         pAge.text.isEmpty ||
-  //         lSelectedGender.isEmpty ||
-  //         pSelectedGender.isEmpty) {
-  //       if (premium.text.isEmpty) emptyPremiumField = true;
-  //       if (sumAssured.text.isEmpty) emptySumField = true;
-  //       if (age.text.isEmpty) emptyAgeField = true;
-  //       if (pAge.text.isEmpty) emptyAgeFieldP = true;
-  //     } else
-  //       noEmptyField = true;
-  //   } else {
-  //     if (premium.text.isEmpty || sumAssured.text.isEmpty || age.text.isEmpty) {
-  //       if (premium.text.isEmpty) emptyPremiumField = true;
-  //       if (sumAssured.text.isEmpty) emptySumField = true;
-  //       if (age.text.isEmpty) emptyAgeField = true;
-  //       if (pAge.text.isEmpty) emptyAgeFieldP = true;
-  //     } else
-  //       noEmptyField = true;
-  //   }
-  //   return noEmptyField;
-  // }
-
-  //Form Validation
-  bool formValidation() {
-    if (_formKey.currentState.validate()) {
-      return true;
-    } else
-      return false;
-  }
-  //
 }
 
 class AlwaysDisabledFocusNode extends FocusNode {

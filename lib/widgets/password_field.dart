@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class PasswordField extends StatelessWidget {
-  PasswordField({this.hintText});
+  PasswordField({this.hintText, this.tec});
 
   final String hintText;
+  final TextEditingController tec;
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +21,7 @@ class PasswordField extends StatelessWidget {
                   blurRadius: 5)
             ]),
         child: TextField(
+          controller: tec,
           keyboardType: TextInputType.name,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.all(15),

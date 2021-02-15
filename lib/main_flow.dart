@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:forte_life/screens/pdf/pdf_screen.dart';
 import 'package:forte_life/screens/pdf/pdf_screen_protect.dart';
 import 'screens/home/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_provider.dart';
+import 'screens/profile/profile_screen.dart';
 
 class MainFlow extends StatefulWidget {
   @override
@@ -10,7 +12,7 @@ class MainFlow extends StatefulWidget {
 }
 
 class _MainFlowState extends State<MainFlow> {
-  final tabs = [HomeScreen(), PDFScreenProtect()];
+  final tabs = [HomeScreen(), PDFScreen(), ProfileScreen()];
 
   @override
   void initState() {
@@ -21,6 +23,9 @@ class _MainFlowState extends State<MainFlow> {
   Widget build(BuildContext context) {
     AppProvider appProvider = Provider.of<AppProvider>(context, listen: false);
     void onTappedBar(int index) {
+      if (appProvider.activeTabIndex == 0) {
+        appProvider.categoriesTabIndex = 0;
+      }
       setState(() {
         appProvider.activeTabIndex = index;
       });

@@ -11,6 +11,9 @@ class LoginScreenUI extends StatelessWidget {
   Widget build(BuildContext context) {
     AppProvider appProvider = Provider.of<AppProvider>(context, listen: false);
     final mq = MediaQuery.of(context);
+    TextEditingController usrName = TextEditingController();
+    TextEditingController passWrd = TextEditingController();
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
@@ -72,12 +75,14 @@ class LoginScreenUI extends StatelessWidget {
                 ),
                 UserNameField(
                   hintText: "Username",
+                  tec: usrName,
                 ),
                 SizedBox(
                   height: 16,
                 ),
                 PasswordField(
                   hintText: "Password",
+                  tec: passWrd,
                 ),
                 SizedBox(
                   height: 32,
@@ -94,8 +99,7 @@ class LoginScreenUI extends StatelessWidget {
                   child: FlatButton(
                     padding: EdgeInsets.all(10),
                     onPressed: () => {
-                      print("Sign In"),
-                      Navigator.pushNamed(context, "/main_flow")
+                      {Navigator.pushNamed(context, "/main_flow")}
                     },
                     child: Text(
                       "Login",

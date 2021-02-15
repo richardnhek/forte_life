@@ -11,7 +11,7 @@ class CustomDialogText extends StatelessWidget {
       style: TextStyle(
         color: Colors.black,
         fontFamily: "Kano",
-        fontSize: 10.5,
+        fontSize: 12,
       ),
     );
   }
