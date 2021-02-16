@@ -15,7 +15,7 @@ import 'package:forte_life/widgets/field_title.dart';
 import 'package:forte_life/widgets/reset_button.dart';
 
 import 'package:intl/intl.dart';
-import 'package:forte_life/widgets/age_field.dart';
+import 'package:forte_life/widgets/disabled_field.dart';
 import 'package:provider/provider.dart';
 
 class CalculationProtectUI extends StatefulWidget {
@@ -68,6 +68,10 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   //Necessary error variables
   int counter = 0;
   //
+  //
+
+  //Regular Expressions
+  RegExp regExpNum = RegExp("[+]?\\d*\\.?\\d+");
   //
 
   int selectedYear = 10;
@@ -304,6 +308,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
       parametersProvider.policyTerm = selectedYear.toString();
       parametersProvider.annualP = premiumNum.toString();
       parametersProvider.basicSA = sumAssuredNum.toString();
+      parametersProvider.paymentMode = selectedMode;
       appProvider.activeTabIndex = 1;
       Navigator.of(context).pushNamed("/main_flow");
     }
@@ -373,10 +378,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                 children: [
                                   Expanded(
                                       flex: 1,
-                                      child: AgeField(
-                                        formController: pAge,
-                                        errorVisible: false,
-                                      )),
+                                      child: DisabledField(
+                                          formController: pAge, title: "Age")),
                                   SizedBox(width: 5),
                                   Expanded(
                                       flex: 2,
@@ -467,10 +470,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                           children: [
                             Expanded(
                                 flex: 1,
-                                child: AgeField(
-                                  formController: age,
-                                  errorVisible: emptyAgeField,
-                                )),
+                                child: DisabledField(
+                                    formController: age, title: "Age")),
                             SizedBox(width: 5),
                             Expanded(
                                 flex: 2,
@@ -577,23 +578,13 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                         selectedMode.isNotEmpty) {
                                       if (premium.text.isNotEmpty) {
                                         premiumNum = double.parse(premium.text);
-                                        sumAssured.text = ((((double.parse(
-                                                            premium.text) /
-                                                        (paymentModeValue(
-                                                                    selectedMode)[
-                                                                1] *
-                                                            paymentModeValue(
-                                                                    selectedMode)[
-                                                                0])) *
-                                                    selectedYear.toDouble())) *
-                                                paymentModeValue(
-                                                    selectedMode)[0])
-                                            .toStringAsFixed(2);
+                                        sumAssuredNum = value * premiumNum;
+                                        sumAssured.text =
+                                            sumAssuredNum.toStringAsFixed(2);
                                       } else if (sumAssured.text.isNotEmpty) {
-                                        premiumNum = (double.parse(
-                                                    sumAssured.text) /
-                                                selectedYear.toDouble()) *
-                                            paymentModeValue(selectedMode)[1];
+                                        sumAssuredNum =
+                                            double.parse(sumAssured.text);
+                                        premiumNum = sumAssuredNum / value;
                                         premium.text =
                                             premiumNum.toStringAsFixed(2);
                                       }
@@ -615,16 +606,9 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                             if (text == "") {
                               sumAssured.text = "";
                             } else
-                              sumAssured.text = ((((double.parse(text) /
-                                              (paymentModeValue(
-                                                      selectedMode)[1] *
-                                                  paymentModeValue(
-                                                      selectedMode)[0])) *
-                                          selectedYear.toDouble())) *
-                                      paymentModeValue(selectedMode)[0])
-                                  .toStringAsFixed(2);
-                            premiumNum = double.parse(text);
-                            sumAssuredNum = double.parse(sumAssured.text);
+                              premiumNum = double.parse(text);
+                            sumAssuredNum = premiumNum * selectedYear;
+                            sumAssured.text = sumAssuredNum.toStringAsFixed(2);
                           } else {
                             sumAssured.text = null;
                           }
@@ -640,12 +624,9 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                             if (text == "") {
                               premium.text = "";
                             } else
-                              premiumNum = ((double.parse(text) /
-                                      selectedYear.toDouble()) *
-                                  paymentModeValue(selectedMode)[1]);
+                              sumAssuredNum = double.parse(text);
+                            premiumNum = sumAssuredNum / selectedYear;
                             premium.text = premiumNum.toStringAsFixed(2);
-                            sumAssuredNum = double.parse(text);
-                            premiumNum = double.parse(premium.text);
                           } else {
                             premium.text = null;
                           }
@@ -915,18 +896,28 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
         description: "Rider can't be empty",
       ));
     } else {
-      if (double.parse(riderAmount) < 3600) {
+      if (regExpNum.hasMatch(riderAmount) == false) {
         customDialogChildren.add(CustomDialogText(
-          description: "Rider must be at least 3600 USD",
+          description: "Rider entered is not a number",
         ));
-      } else if (double.parse(riderAmount) >
-          (double.parse(sumAssuredAmount) * 5)) {
+      } else if (double.parse(riderAmount) < 0) {
         customDialogChildren.add(CustomDialogText(
-          description:
-              "Rider is currently limited, please check information page",
+          description: "Rider can't be 0 or a negative amount",
         ));
-      } else
-        counter++;
+      } else {
+        if (double.parse(riderAmount) < 3600) {
+          customDialogChildren.add(CustomDialogText(
+            description: "Rider must be at least 3600 USD",
+          ));
+        } else if (double.parse(riderAmount) >
+            (double.parse(sumAssuredAmount) * 5)) {
+          customDialogChildren.add(CustomDialogText(
+            description:
+                "Rider is currently limited, please check information page",
+          ));
+        } else
+          counter++;
+      }
     }
   }
   //
@@ -938,71 +929,87 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
         description: "Sum Assured can't be empty",
       ));
     } else {
-      switch (policyTerm) {
-        case 10:
-          {
-            if (double.parse(sumAssuredAmount) < 2400) {
-              customDialogChildren.add(CustomDialogText(
-                description: "Sum Assured must be at least 2400 USD",
-              ));
-            } else
-              counter++;
-            break;
-          }
-        case 15:
-          {
-            if (double.parse(sumAssuredAmount) < 3600) {
-              customDialogChildren.add(CustomDialogText(
-                description: "Sum Assured must be at least 3600 USD",
-              ));
-            } else
-              counter++;
+      if (regExpNum.hasMatch(sumAssuredAmount) == false) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Sum Assured entered is not a number",
+        ));
+      } else if (double.parse(sumAssuredAmount) < 0) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Sum Assured can't be 0 or a negative amount",
+        ));
+      } else {
+        switch (policyTerm) {
+          case 10:
+            {
+              if (double.parse(sumAssuredAmount) < 2400) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (10): Sum Assured must be at least 2400 USD",
+                ));
+              } else
+                counter++;
+              break;
+            }
+          case 15:
+            {
+              if (double.parse(sumAssuredAmount) < 3600) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (15): Sum Assured must be at least 3600 USD",
+                ));
+              } else
+                counter++;
 
-            break;
-          }
-        case 20:
-          {
-            if (double.parse(sumAssuredAmount) < 4800) {
-              customDialogChildren.add(CustomDialogText(
-                description: "Sum Assured must be at least 4800 USD",
-              ));
-            } else
-              counter++;
-            break;
-          }
-        case 25:
-          {
-            if (double.parse(sumAssuredAmount) < 6000) {
-              customDialogChildren.add(CustomDialogText(
-                description: "Sum Assured must be at least 6000 USD",
-              ));
-            } else
-              counter++;
+              break;
+            }
+          case 20:
+            {
+              if (double.parse(sumAssuredAmount) < 4800) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (20): Sum Assured must be at least 4800 USD",
+                ));
+              } else
+                counter++;
+              break;
+            }
+          case 25:
+            {
+              if (double.parse(sumAssuredAmount) < 6000) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (25): Sum Assured must be at least 6000 USD",
+                ));
+              } else
+                counter++;
 
-            break;
-          }
-        case 30:
-          {
-            if (double.parse(sumAssuredAmount) < 7200) {
-              customDialogChildren.add(CustomDialogText(
-                description: "Sum Assured must be at least 7200 USD",
-              ));
-            } else
-              counter++;
+              break;
+            }
+          case 30:
+            {
+              if (double.parse(sumAssuredAmount) < 7200) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (30): Sum Assured must be at least 7200 USD",
+                ));
+              } else
+                counter++;
 
-            break;
-          }
-        case 35:
-          {
-            if (double.parse(sumAssuredAmount) < 8400) {
-              customDialogChildren.add(CustomDialogText(
-                description: "Sum Assured must be at least 8400 USD",
-              ));
-            } else
-              counter++;
+              break;
+            }
+          case 35:
+            {
+              if (double.parse(sumAssuredAmount) < 8400) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (35): Sum Assured must be at least 8400 USD",
+                ));
+              } else
+                counter++;
 
-            break;
-          }
+              break;
+            }
+        }
       }
     }
   }
@@ -1014,12 +1021,22 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
       customDialogChildren.add(CustomDialogText(
         description: "Premium can't be empty",
       ));
-    } else if (double.parse(premiumAmount) < 240) {
-      customDialogChildren.add(CustomDialogText(
-        description: "Premium must be at least 240 USD",
-      ));
     } else {
-      counter++;
+      if (regExpNum.hasMatch(premiumAmount) == false) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Premium entered is not a number",
+        ));
+      } else if (double.parse(premiumAmount) <= 0) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Premium can't be 0 or a negative amount",
+        ));
+      } else if (((double.parse(premiumAmount) > 0) &&
+          (double.parse(premiumAmount) < 240))) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Premium must be at least 240 USD",
+        ));
+      } else
+        counter++;
     }
   }
   //

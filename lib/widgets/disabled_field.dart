@@ -1,11 +1,10 @@
-import 'package:align_positioned/align_positioned.dart';
 import 'package:flutter/material.dart';
 
-class AgeField extends StatelessWidget {
-  AgeField({this.formController, this.errorVisible});
+class DisabledField extends StatelessWidget {
+  DisabledField({this.formController, this.title});
 
   final TextEditingController formController;
-  final bool errorVisible;
+  final String title;
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
@@ -29,8 +28,8 @@ class AgeField extends StatelessWidget {
                 focusedBorder: InputBorder.none,
                 contentPadding: EdgeInsets.only(left: 5, top: 10, bottom: 10),
                 isDense: true,
-                hintText: "Age",
-                labelText: "Age",
+                hintText: title,
+                labelText: title,
                 labelStyle: TextStyle(
                     fontFamily: "Kano",
                     fontSize: 15,

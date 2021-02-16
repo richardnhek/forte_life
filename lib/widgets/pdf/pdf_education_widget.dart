@@ -37,10 +37,10 @@ class PDFWidgetEdu {
     final regularF = Font.ttf(regularData);
     final boldF = Font.ttf(boldData);
     final Map<int, TableColumnWidth> columnWidthVal = {
-      0: FlexColumnWidth(0.5),
+      0: FlexColumnWidth(0.4),
       1: FlexColumnWidth(2),
-      2: FlexColumnWidth(2),
-      3: FlexColumnWidth(0.75),
+      2: FlexColumnWidth(1.5),
+      3: FlexColumnWidth(0.6),
       4: FlexColumnWidth(3)
     };
 
@@ -48,7 +48,6 @@ class PDFWidgetEdu {
     double accumulatedPremium = 0;
     double allCauses = 0;
     double cashValue = 0;
-    double premiumNumNum = 0;
     //
 
     //Convert String to Double for ease of use
@@ -60,15 +59,49 @@ class PDFWidgetEdu {
     String halfP = (premiumNum * 0.5178).toStringAsFixed(2);
     String quarterlyP = (premiumNum * 0.2635).toStringAsFixed(2);
     String monthlyP = (premiumNum * 0.0888).toStringAsFixed(2);
+    double halfPNum = double.parse(halfP);
+    double quarterlyPNum = double.parse(quarterlyP);
+    double monthlyPNum = double.parse(monthlyP);
     String premiumStr = premiumNum.toStringAsFixed(2);
     String accumulatedPremiumStr = premiumNum.toStringAsFixed(2);
     String cashValueStr = cashValue.toStringAsFixed(2);
     //
 
-    List<List<dynamic>> getDynamicRow(int policyYear, int age) {
+    double getGSB() {
+      if (int.parse(pAge) < 50) {
+        return (basicSANum * (double.parse(policyTerm) * 2) / 100);
+      } else {
+        return (basicSANum * double.parse(policyTerm) / 100);
+      }
+    }
+
+    List<List<dynamic>> getDynamicRow(
+        int policyYear, int age, String paymentMode) {
       List<List<dynamic>> dynamicRow = List();
       int i = 1;
       double cashValPercentage = 0;
+
+      switch (paymentMode) {
+        case "Yearly":
+          {
+            break;
+          }
+        case "Half-yearly":
+          {
+            premiumNum = halfPNum * 2;
+            break;
+          }
+        case "Quarterly":
+          {
+            premiumNum = quarterlyPNum * 4;
+            break;
+          }
+        case "Monthly":
+          {
+            premiumNum = monthlyPNum * 12;
+            break;
+          }
+      }
       accumulatedPremium += premiumNum;
       //All causes and accidents, List initialization
       switch (age) {
@@ -89,7 +122,7 @@ class PDFWidgetEdu {
             accumulatedPremium += premiumNum;
             dynamicRow.add([
               "$i",
-              "         $premiumNum             ${accumulatedPremium.toStringAsFixed(2)}     ",
+              "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}     ",
               "$allCauses",
               "-",
               "-"
@@ -102,7 +135,7 @@ class PDFWidgetEdu {
             dynamicRow = [
               [
                 "$i",
-                "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}      ",
+                "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}     ",
                 "$allCauses",
                 "-",
                 "-"
@@ -118,7 +151,7 @@ class PDFWidgetEdu {
             dynamicRow = [
               [
                 "$i",
-                "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}      ",
+                "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}     ",
                 "$allCauses",
                 "-",
                 "-"
@@ -150,16 +183,16 @@ class PDFWidgetEdu {
             "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}      ",
             "$allCauses",
             cashValueStr,
-            "-"
+            "          -                              -                             -         "
           ]);
           i++;
         } else {
           dynamicRow.add([
             "$i",
-            "         $premiumNum              ${accumulatedPremium.round().toStringAsFixed(2)}     ",
+            "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}     ",
             "$allCauses",
             cashValue.round().toStringAsFixed(2),
-            "-"
+            "${basicSANum.toStringAsFixed(2)}                        ${getGSB()}                           ${basicSANum + getGSB()}"
           ]);
           i++;
         }
@@ -171,10 +204,10 @@ class PDFWidgetEdu {
     List<String> getDynamicHeaders() {
       List<String> dynamicHeader = [
         "End of Policy Year",
-        "                 Premium (USD) \n \n       Annualized     Accumulated",
-        "             Total Death/TPD (USD) \n \n           All Causes          ",
-        "Cash Value",
-        "Guaranteed Special Benefit"
+        "                 Premium (USD) \n \n         Annualized     Accumulated",
+        "     Total Death/TPD (USD) \n \n              All Causes          ",
+        "     Cash \n    Value",
+        "    Guaranteed               Guaranteed             Total Maturity    \n Maturity Benefit         Special Benefit                Benefit  "
       ];
       return dynamicHeader;
     }
@@ -468,8 +501,8 @@ class PDFWidgetEdu {
                           left: BorderSide(),
                           right: BorderSide()),
                       context: context,
-                      data: getDynamicRow(
-                          int.parse(policyTerm), int.parse(lpAge))),
+                      data: getDynamicRow(int.parse(policyTerm),
+                          int.parse(lpAge), paymentMode)),
                   Padding(
                     padding: EdgeInsets.only(top: 5),
                     child: Flexible(

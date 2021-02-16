@@ -15,7 +15,7 @@ import 'package:forte_life/widgets/field_title.dart';
 import 'package:forte_life/widgets/reset_button.dart';
 
 import 'package:intl/intl.dart';
-import 'package:forte_life/widgets/age_field.dart';
+import 'package:forte_life/widgets/disabled_field.dart';
 import 'package:provider/provider.dart';
 
 class CalculationEducationUI extends StatefulWidget {
@@ -56,15 +56,16 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
   String lSelectedGender;
   String pSelectedGender;
   String selectedMode = "Yearly";
-
-  //Necessary error variables
-  int counter = 0;
-  //
-  //
-
-  int selectedYear = 10;
   double premiumNum;
   double sumAssuredNum;
+
+  //Necessary error variables
+  int counter;
+  //
+
+  //Regular Expressions
+  RegExp regExpNum = RegExp("[+]?\\d*\\.?\\d+");
+  //
 
   List<Widget> customDialogChildren = List();
 
@@ -105,17 +106,6 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
         value: "Monthly")
   ];
 
-  List<DropdownMenuItem> policyYears = [
-    DropdownMenuItem(child: DropDownText(title: "10"), value: 10),
-    DropdownMenuItem(child: DropDownText(title: "11"), value: 11),
-    DropdownMenuItem(child: DropDownText(title: "12"), value: 12),
-    DropdownMenuItem(child: DropDownText(title: "13"), value: 13),
-    DropdownMenuItem(child: DropDownText(title: "14"), value: 14),
-    DropdownMenuItem(child: DropDownText(title: "15"), value: 15),
-    DropdownMenuItem(child: DropDownText(title: "16"), value: 16),
-    DropdownMenuItem(child: DropDownText(title: "17"), value: 17),
-  ];
-
   DateTime _selectedDate;
   DateTime _currentDate = DateTime.now();
   //
@@ -145,7 +135,13 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
             children: customDialogChildren),
         actions: [
           FlatButton(
-            child: Text("OK"),
+            child: Text(
+              "OK",
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF8AB84B)),
+            ),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -161,6 +157,45 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
         },
       );
     }
+
+    //Validate Policy Year
+    void checkPolicyYear(int policy, int childAge) {
+      customDialogChildren.clear();
+      if (policy < 10) {
+        customDialogChildren.addAll([
+          CustomDialogText(
+            description:
+                "Policy Year ($policy) invalid: must be at least 10 years",
+          ),
+          CustomDialogText(
+            description:
+                "Life Proposed's Age ($childAge) invalid: Child's age is limited to 8 years old",
+          ),
+        ]);
+        showAlertDialog(context);
+        policyYear.clear();
+        age.clear();
+        dob.clear();
+      } else if (policy > 17) {
+        customDialogChildren.addAll([
+          CustomDialogText(
+            description:
+                "Policy Year ($policy) invalid: Policy Year is limited to at most 17 years",
+          ),
+          CustomDialogText(
+            description:
+                "Life Proposed's Age ($childAge) invalid: Child's age must be at least 1 year old",
+          ),
+        ]);
+        showAlertDialog(context);
+        policyYear.clear();
+        age.clear();
+        dob.clear();
+      } else {
+        policyYear.text = policy.toString();
+      }
+    }
+    //
 
     //Get each value of each Payment Mode
     List<double> paymentModeValue(String selectedMode) {
@@ -207,7 +242,8 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
       parametersProvider.lpOccupation = lOccupation.text.toString();
       //
 
-      parametersProvider.policyTerm = selectedYear.toString();
+      parametersProvider.policyTerm = policyYear.text;
+      parametersProvider.paymentMode = selectedMode;
       parametersProvider.annualP = premiumNum.toString();
       parametersProvider.basicSA = sumAssuredNum.toString();
       appProvider.pdfScreenIndex = 1;
@@ -268,9 +304,9 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                               children: [
                                 Expanded(
                                     flex: 1,
-                                    child: AgeField(
+                                    child: DisabledField(
                                       formController: pAge,
-                                      errorVisible: false,
+                                      title: "Age",
                                     )),
                                 SizedBox(width: 5),
                                 Expanded(
@@ -279,7 +315,7 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                                       focusNode: AlwaysDisabledFocusNode(),
                                       dob: pDob,
                                       onTap: () {
-                                        _selectDate(context, pDob, pAge);
+                                        _selectDate(context, pDob, pAge, false);
                                       },
                                     )),
                               ],
@@ -360,9 +396,9 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                           children: [
                             Expanded(
                                 flex: 1,
-                                child: AgeField(
+                                child: DisabledField(
                                   formController: age,
-                                  errorVisible: false,
+                                  title: "Age",
                                 )),
                             SizedBox(width: 5),
                             Expanded(
@@ -370,8 +406,10 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                                 child: CustomDatePicker(
                                   focusNode: AlwaysDisabledFocusNode(),
                                   dob: dob,
-                                  onTap: () {
-                                    _selectDate(context, dob, age);
+                                  onTap: () async {
+                                    await _selectDate(context, dob, age, true);
+                                    checkPolicyYear(int.parse(policyYear.text),
+                                        int.parse(age.text));
                                   },
                                 )),
                           ],
@@ -424,77 +462,17 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                                 onChange: (value) {
                                   setState(() {
                                     selectedMode = value;
-                                    if ((premium.text.isNotEmpty ||
-                                            sumAssured.text.isNotEmpty) &&
-                                        (selectedYear != null)) {
-                                      if (premium.text.isNotEmpty) {
-                                        premiumNum = double.parse(premium.text);
-                                        sumAssured.text = ((((double.parse(
-                                                            premium.text) /
-                                                        (paymentModeValue(
-                                                                    selectedMode)[
-                                                                1] *
-                                                            paymentModeValue(
-                                                                    selectedMode)[
-                                                                0])) *
-                                                    selectedYear.toDouble())) *
-                                                paymentModeValue(
-                                                    selectedMode)[0])
-                                            .toStringAsFixed(2);
-                                      } else if (sumAssured.text.isNotEmpty) {
-                                        premiumNum = (double.parse(
-                                                    sumAssured.text) /
-                                                selectedYear.toDouble()) *
-                                            paymentModeValue(selectedMode)[1];
-                                        premium.text =
-                                            premiumNum.toStringAsFixed(2);
-                                      }
-                                    }
                                   });
                                 },
                               ),
                             ),
                             SizedBox(width: 5),
                             Expanded(
-                              flex: 1,
-                              child: CustomDropDown(
-                                title: "Policy Year",
-                                value: selectedYear,
-                                items: policyYears,
-                                errorVisible: false,
-                                onChange: (value) {
-                                  setState(() {
-                                    selectedYear = value;
-                                    if ((premium.text.isNotEmpty ||
-                                            sumAssured.text.isNotEmpty) &&
-                                        selectedMode.isNotEmpty) {
-                                      if (premium.text.isNotEmpty) {
-                                        premiumNum = double.parse(premium.text);
-                                        sumAssured.text = ((((double.parse(
-                                                            premium.text) /
-                                                        (paymentModeValue(
-                                                                    selectedMode)[
-                                                                1] *
-                                                            paymentModeValue(
-                                                                    selectedMode)[
-                                                                0])) *
-                                                    selectedYear.toDouble())) *
-                                                paymentModeValue(
-                                                    selectedMode)[0])
-                                            .toStringAsFixed(2);
-                                      } else if (sumAssured.text.isNotEmpty) {
-                                        premiumNum = (double.parse(
-                                                    sumAssured.text) /
-                                                selectedYear.toDouble()) *
-                                            paymentModeValue(selectedMode)[1];
-                                        premium.text =
-                                            premiumNum.toStringAsFixed(2);
-                                      }
-                                    }
-                                  });
-                                },
-                              ),
-                            ),
+                                flex: 1,
+                                child: DisabledField(
+                                  title: "Policy Year",
+                                  formController: policyYear,
+                                )),
                           ],
                         ),
                       ),
@@ -504,19 +482,14 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                         formController: premium,
                         errorVisible: false,
                         onChange: (text) {
-                          if (selectedYear != null) {
+                          if (int.parse(policyYear.text) != null) {
                             if (text == "") {
                               sumAssured.text = "";
                             } else
-                              sumAssured.text = ((((double.parse(text) /
-                                              (paymentModeValue(
-                                                      selectedMode)[1] *
-                                                  paymentModeValue(
-                                                      selectedMode)[0])) *
-                                          selectedYear.toDouble())) *
-                                      paymentModeValue(selectedMode)[0])
-                                  .toStringAsFixed(2);
-                            premiumNum = double.parse(text);
+                              premiumNum = double.parse(text);
+                            sumAssured.text =
+                                (double.parse(policyYear.text) * premiumNum)
+                                    .toStringAsFixed(2);
                             sumAssuredNum = double.parse(sumAssured.text);
                           } else {
                             sumAssured.text = null;
@@ -529,16 +502,17 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                         formController: sumAssured,
                         errorVisible: false,
                         onChange: (text) {
-                          if (selectedYear != null) {
+                          print(policyYear.text);
+                          if (int.parse(policyYear.text) != null) {
                             if (text == "") {
                               premium.text = "";
                             } else
-                              premiumNum = ((double.parse(text) /
-                                      selectedYear.toDouble()) *
-                                  paymentModeValue(selectedMode)[1]);
+                              premiumNum = (double.parse(text) /
+                                  double.parse(policyYear.text));
                             premium.text = premiumNum.toStringAsFixed(2);
                             sumAssuredNum = double.parse(text);
                             premiumNum = double.parse(premium.text);
+                            print(sumAssuredNum);
                           } else {
                             premium.text = null;
                           }
@@ -558,12 +532,13 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                           counter = 0;
                           customDialogChildren.clear();
                           _formKey.currentState.save();
+                          policyYearValidation(policyYear.text);
                           sumAssuredValidation(
-                              sumAssured.text, premium.text, selectedYear);
+                              sumAssured.text, premium.text, policyYear.text);
                           premiumValidation(premium.text);
-                          ageValidation(age.text, pAge.text, selectedYear);
+                          ageValidation(age.text, pAge.text, policyYear.text);
                           print(counter);
-                          if (counter == 3) {
+                          if (counter == 4) {
                             calculateAndPDF();
                           } else
                             showAlertDialog(context);
@@ -603,7 +578,7 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
 
                             lSelectedGender = null;
                             pSelectedGender = null;
-                            selectedYear = 0;
+                            policyYear.text = null;
                           },
                         ))
                   ],
@@ -618,7 +593,7 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
 
   // Date Picker Function
   _selectDate(BuildContext context, TextEditingController tec,
-      TextEditingController tecAge) async {
+      TextEditingController tecAge, bool isLpAge) async {
     DateTime newSelectedDate = await showDatePicker(
         context: context,
         initialDate: _selectedDate != null ? _selectedDate : DateTime.now(),
@@ -646,14 +621,14 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
         tec.text = convertDateTimeDisplay(dateTime);
         tec.selection = TextSelection.fromPosition(TextPosition(
             offset: dob.text.length, affinity: TextAffinity.upstream));
-        tecAge.text = calculateAge(_selectedDate);
+        tecAge.text = calculateAge(_selectedDate, isLpAge);
       });
     }
   }
 //
 
 // Calculate age from datepicker
-  calculateAge(DateTime birthDate) {
+  calculateAge(DateTime birthDate, bool isLpAge) {
     int age = _currentDate.year - birthDate.year;
     int month1 = _currentDate.month;
     int month2 = birthDate.month;
@@ -665,6 +640,11 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
       if (day2 > day1) {
         age--;
       }
+    }
+    if (isLpAge) {
+      policyYear.text = (18 - age).toString();
+      sumAssured.clear();
+      premium.clear();
     }
     return age.toString();
   }
@@ -681,40 +661,22 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
   //
 
   //Validate Age
-  void ageValidation(String ageText, String pAgeText, int policyTerm) {
+  void ageValidation(String ageText, String pAgeText, String policyTerm) {
     if (ageText.isEmpty || pAgeText.isEmpty) {
       customDialogChildren.add(CustomDialogText(
         description: "Age field can't be empty",
       ));
     } else {
-      if (((int.parse(pAgeText) + policyTerm) > 69) ||
-          (int.parse(pAgeText) < 18) ||
-          (int.parse(pAgeText) > 59) ||
-          (int.parse(ageText) < 1) ||
-          ((int.parse(ageText) + policyTerm) > 18)) {
-        if ((int.parse(pAgeText) + policyTerm) > 69 ||
-            (int.parse(pAgeText) > 59)) {
-          customDialogChildren.add(CustomDialogText(
-            description:
-                "Payor's age limit exceeded, please check information page.",
-          ));
-        }
-        if (int.parse(pAgeText) < 18) {
-          customDialogChildren.add(CustomDialogText(
-            description: "Payor's age under 18, please check information page",
-          ));
-        }
-        if (int.parse(ageText) < 1) {
-          customDialogChildren.add(CustomDialogText(
-            description: "Child's age must be at least 1 year old",
-          ));
-        }
-        if ((int.parse(ageText) + policyTerm) > 18) {
-          customDialogChildren.add(CustomDialogText(
-            description:
-                "Child's age limit exceeded, please check information page",
-          ));
-        }
+      if ((int.parse(pAgeText) + int.parse(policyTerm)) > 69 ||
+          (int.parse(pAgeText) > 59)) {
+        customDialogChildren.add(CustomDialogText(
+          description:
+              "Payor's age limit exceeded, please check information page.",
+        ));
+      } else if (int.parse(pAgeText) < 18) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Payor's age under 18, please check information page",
+        ));
       } else {
         counter++;
       }
@@ -722,44 +684,151 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
   }
   //
 
+  void policyYearValidation(String policyYearText) {
+    if (policyYearText.isEmpty) {
+      customDialogChildren.add(CustomDialogText(
+        description: "Policy Year can't be empty",
+      ));
+    } else {
+      counter++;
+    }
+  }
+
   //Validate Sum Assured
   void sumAssuredValidation(
-      String sumAssuredAmount, String premiumAmount, int policyTerm) {
+      String sumAssuredAmount, String premiumAmount, String policyTerm) {
     if (sumAssuredAmount.isEmpty) {
       customDialogChildren.add(CustomDialogText(
         description: "Sum Assured can't be empty",
       ));
     } else {
-      if (double.parse(sumAssuredAmount) < 2400) {
+      if (regExpNum.hasMatch(sumAssuredAmount) == false) {
         customDialogChildren.add(CustomDialogText(
-          description: "Sum Assured must be at least 2400 USD",
+          description: "Sum Assured entered is not a number",
+        ));
+      } else if (double.parse(sumAssuredAmount) < 0) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Sum Assured can't be a negative number",
         ));
       } else {
-        if (double.parse(sumAssuredAmount) <
-            (double.parse(premiumAmount) *
-                double.parse(policyTerm.toString()))) {
-          customDialogChildren.add(CustomDialogText(
-            description:
-                "Sum Assured must be more than ${int.parse((double.parse(premiumAmount) * double.parse(policyTerm.toString())).toStringAsFixed(0))} for Policy Term $policyTerm and Premium $premium",
-          ));
+        switch (policyTerm) {
+          case "10":
+            {
+              if (double.parse(sumAssuredAmount) < 2400) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (10): Sum Assured must be at least 2,400 USD",
+                ));
+              } else
+                counter++;
+              break;
+            }
+          case "11":
+            {
+              if (double.parse(sumAssuredAmount) < 2640) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (11): Sum Assured must be at least 2,640 USD",
+                ));
+              } else
+                counter++;
+
+              break;
+            }
+          case "12":
+            {
+              if (double.parse(sumAssuredAmount) < 2880) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (12): Sum Assured must be at least 2,880 USD",
+                ));
+              } else
+                counter++;
+              break;
+            }
+          case "13":
+            {
+              if (double.parse(sumAssuredAmount) < 3120) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (13): Sum Assured must be at least 3,120 USD",
+                ));
+              } else
+                counter++;
+              break;
+            }
+          case "14":
+            {
+              if (double.parse(sumAssuredAmount) < 3360) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (14): Sum Assured must be at least 3,360 USD",
+                ));
+              } else
+                counter++;
+              break;
+            }
+          case "15":
+            {
+              if (double.parse(sumAssuredAmount) < 3600) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (15): Sum Assured must be at least 3,600 USD",
+                ));
+              } else
+                counter++;
+              break;
+            }
+          case "16":
+            {
+              if (double.parse(sumAssuredAmount) < 3840) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (16): Sum Assured must be at least 3,840 USD",
+                ));
+              } else
+                counter++;
+              break;
+            }
+          case "17":
+            {
+              if (double.parse(sumAssuredAmount) < 4080) {
+                customDialogChildren.add(CustomDialogText(
+                  description:
+                      "For Policy Term (17): Sum Assured must be at least 4,080 USD",
+                ));
+              } else
+                counter++;
+              break;
+            }
         }
       }
     }
   }
   //
 
-  //Validate Sum Assured
+  //Validate Premium
   void premiumValidation(String premiumAmount) {
     if (premiumAmount.isEmpty) {
       customDialogChildren.add(CustomDialogText(
         description: "Premium can't be empty",
       ));
-    } else if (double.parse(premiumAmount) < 240) {
-      customDialogChildren.add(CustomDialogText(
-        description: "Premium must be at least 240 USD",
-      ));
     } else {
-      counter++;
+      if (regExpNum.hasMatch(premiumAmount) == false) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Premium entered is not a number",
+        ));
+      } else if (double.parse(premiumAmount) <= 0) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Premium can't be 0 or a negative amount",
+        ));
+      } else if (((double.parse(premiumAmount) > 0) &&
+          (double.parse(premiumAmount) < 240))) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Premium must be at least 240 USD",
+        ));
+      } else
+        counter++;
     }
   }
   //

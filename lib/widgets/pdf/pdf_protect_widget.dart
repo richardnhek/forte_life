@@ -41,10 +41,10 @@ class PDFWidget {
     final regularF = Font.ttf(regularData);
     final boldF = Font.ttf(boldData);
     final Map<int, TableColumnWidth> columnWidthVal = {
-      0: FlexColumnWidth(0.5),
+      0: FlexColumnWidth(0.4),
       1: FlexColumnWidth(2),
-      2: FlexColumnWidth(2),
-      3: FlexColumnWidth(0.75),
+      2: FlexColumnWidth(1.5),
+      3: FlexColumnWidth(0.6),
       4: FlexColumnWidth(3)
     };
 
@@ -78,6 +78,9 @@ class PDFWidget {
     String halfP = (totalPremium * 0.5178).toStringAsFixed(2);
     String quarterlyP = (totalPremium * 0.2635).toStringAsFixed(2);
     String monthlyP = (totalPremium * 0.0888).toStringAsFixed(2);
+    double halfPNum = double.parse(halfP);
+    double quarterlyPNum = double.parse(quarterlyP);
+    double monthlyPNum = double.parse(monthlyP);
     String premiumStr = premiumNum.toStringAsFixed(2);
     String riderSAStr = riderSANum.toStringAsFixed(2);
     String premiumRiderStr = premiumRiderNum.toStringAsFixed(2);
@@ -88,13 +91,47 @@ class PDFWidget {
         accumulatedPremiumNoRider.toStringAsFixed(2);
     //
 
-    List<List<dynamic>> getDynamicRow(int policyYear, int age) {
+    double getGSB() {
+      if (int.parse(lpAge) < 50) {
+        return (basicSANum * (double.parse(policyTerm) * 2) / 100);
+      } else {
+        return (basicSANum * double.parse(policyTerm) / 100);
+      }
+    }
+
+    List<List<dynamic>> getDynamicRow(
+        int policyYear, int age, String paymentMode) {
       List<List<dynamic>> dynamicRow = List();
       int i = 1;
       double cashValPercentage = 0;
+
+      switch (paymentMode) {
+        case "Yearly":
+          {
+            break;
+          }
+        case "Half-yearly":
+          {
+            premiumNum = halfPNum * 2;
+            break;
+          }
+        case "Quarterly":
+          {
+            premiumNum = quarterlyPNum * 4;
+            break;
+          }
+        case "Monthly":
+          {
+            premiumNum = monthlyPNum * 12;
+            break;
+          }
+      }
       totalPremiumNum = (premiumNum + premiumRiderNum);
       accumulatedPremiumNoRider += premiumNum;
       accumulatedPremium += totalPremiumNum;
+      print(premiumNum);
+      print(totalPremiumNum);
+      print(accumulatedPremium);
       //All causes and accidents, List initialization
       switch (age) {
         case 1:
@@ -104,10 +141,10 @@ class PDFWidget {
             dynamicRow = [
               [
                 "$i",
-                "         $totalPremiumStr              $accumulatedPremiumStr     ",
-                "$allCauses $allAccidents",
+                "         ${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}     ",
+                "     $allCauses            $allAccidents     ",
                 "-",
-                "-"
+                "          -                              -                             -         "
               ],
             ];
             i++;
@@ -117,10 +154,10 @@ class PDFWidget {
             accumulatedPremium += totalPremiumNum;
             dynamicRow.add([
               "$i",
-              "         $totalPremiumStr              $accumulatedPremiumStr     ",
-              "         $allCauses            $allAccidents     ",
+              "         ${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}     ",
+              "     $allCauses            $allAccidents     ",
               "-",
-              "-"
+              "          -                              -                             -         "
             ]);
             break;
           }
@@ -132,10 +169,10 @@ class PDFWidget {
             dynamicRow = [
               [
                 "$i",
-                "         $totalPremiumStr              $accumulatedPremiumStr     ",
-                "         $allCauses            $allAccidents     ",
+                "         ${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}     ",
+                "     $allCauses            $allAccidents     ",
                 "-",
-                "-"
+                "          -                              -                             -         "
               ],
             ];
 
@@ -149,10 +186,10 @@ class PDFWidget {
             dynamicRow = [
               [
                 "$i",
-                "         $totalPremiumStr              $accumulatedPremiumStr     ",
-                "         $allCauses            $allAccidents     ",
+                "         ${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}     ",
+                "     $allCauses            $allAccidents     ",
                 "-",
-                "-"
+                "          -                              -                             -         "
               ]
             ];
             break;
@@ -163,8 +200,8 @@ class PDFWidget {
       allCauses = basicSANum + riderSANum;
       allAccidents = (basicSANum * 2) + riderSANum;
       while (i <= policyYear) {
+        totalPremiumNum = (premiumNum + premiumRiderNum);
         accumulatedPremium += totalPremiumNum;
-        accumulatedPremiumStr = accumulatedPremium.toStringAsFixed(2);
         accumulatedPremiumNoRider += premiumNum;
         if (i >= 3) {
           if (i <= 16) {
@@ -180,19 +217,19 @@ class PDFWidget {
         if (i < policyYear) {
           dynamicRow.add([
             "$i",
-            "         $totalPremiumStr              $accumulatedPremiumStr     ",
-            "         $allCauses            $allAccidents     ",
+            "         ${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}     ",
+            "     $allCauses            $allAccidents     ",
             cashValueStr,
-            "-"
+            "     -                                    -                                  -     "
           ]);
           i++;
         } else {
           dynamicRow.add([
             "$i",
-            "         $totalPremiumStr              ${accumulatedPremium.round().toStringAsFixed(2)}     ",
-            "         $allCauses            $allAccidents     ",
-            cashValue.round().toStringAsFixed(2),
-            "-"
+            "         ${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}     ",
+            "     $allCauses            $allAccidents     ",
+            cashValue.toStringAsFixed(2),
+            "${basicSANum.toStringAsFixed(2)}                        ${getGSB()}                           ${basicSANum + getGSB()}"
           ]);
           i++;
         }
@@ -204,10 +241,10 @@ class PDFWidget {
     List<String> getDynamicHeaders() {
       List<String> dynamicHeader = [
         "End of Policy Year",
-        "                 Premium (USD) \n \n       Annualized     Accumulated",
-        "             Total Death/TPD (USD) \n \n           All Causes      Accidents    ",
-        "Cash Value",
-        "Guaranteed Special Benefit"
+        "                 Premium (USD) \n \n         Annualized     Accumulated",
+        "     Total Death/TPD (USD) \n \n     All Causes    Accidents    ",
+        "     Cash \n    Value",
+        "    Guaranteed               Guaranteed             Total Maturity    \n Maturity Benefit         Special Benefit             Benefit  "
       ];
       return dynamicHeader;
     }
@@ -559,8 +596,8 @@ class PDFWidget {
                           left: BorderSide(),
                           right: BorderSide()),
                       context: context,
-                      data: getDynamicRow(
-                          int.parse(policyTerm), int.parse(lpAge))),
+                      data: getDynamicRow(int.parse(policyTerm),
+                          int.parse(lpAge), paymentMode)),
                   Padding(
                     padding: EdgeInsets.only(top: 5),
                     child: Flexible(
