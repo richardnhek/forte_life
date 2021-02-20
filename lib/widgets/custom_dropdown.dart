@@ -3,13 +3,19 @@ import 'package:flutter/material.dart';
 
 class CustomDropDown extends StatelessWidget {
   CustomDropDown(
-      {this.value, this.items, this.onChange, this.title, this.errorVisible});
+      {this.value,
+      this.items,
+      this.onChange,
+      this.title,
+      this.errorVisible,
+      this.isRequired});
 
   final dynamic value;
   final List<dynamic> items;
   final Function onChange;
   final String title;
   final bool errorVisible;
+  final bool isRequired;
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
@@ -35,8 +41,11 @@ class CustomDropDown extends StatelessWidget {
                   onChanged: onChange),
             ),
           ),
-          decoration:
-              BoxDecoration(border: Border.all(color: Color(0xFFB8B8B8))),
+          decoration: BoxDecoration(
+              border: Border.all(
+                  color: isRequired == false
+                      ? Color(0xFFB8B8B8)
+                      : Color(0xFFD31145))),
         ),
         AlignPositioned(
           alignment: Alignment.bottomLeft,

@@ -1,6 +1,7 @@
 import 'package:align_positioned/align_positioned.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextField extends StatelessWidget {
   CustomTextField(
@@ -11,6 +12,7 @@ class CustomTextField extends StatelessWidget {
       this.onSaved,
       this.validateFunc,
       this.errorVisible,
+      this.isRequired,
       this.maxLength});
 
   final String formLabel;
@@ -20,6 +22,7 @@ class CustomTextField extends StatelessWidget {
   final Function onSaved;
   final Function validateFunc;
   final bool errorVisible;
+  final bool isRequired;
   final int maxLength;
 
   @override
@@ -31,14 +34,19 @@ class CustomTextField extends StatelessWidget {
       ),
       child: Stack(children: [
         Container(
-          decoration:
-              BoxDecoration(border: Border.all(color: Color(0xFFB8B8B8))),
+          decoration: BoxDecoration(
+              border: Border.all(
+                  color: isRequired == false
+                      ? Color(0xFFB8B8B8)
+                      : Color(0xFFD31145))),
           child: TextFormField(
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: validateFunc,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(maxLength),
+            ],
             onSaved: onSaved,
             maxLines: 1,
-            maxLength: maxLength,
             onChanged: onChange,
             textAlignVertical: TextAlignVertical.bottom,
             controller: formController,

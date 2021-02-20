@@ -197,33 +197,6 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
     }
     //
 
-    //Get each value of each Payment Mode
-    List<double> paymentModeValue(String selectedMode) {
-      switch (selectedMode) {
-        case "Yearly":
-          {
-            return [1, 1];
-          }
-        case "Half-yearly":
-          {
-            return [2, 0.5178];
-          }
-        case "Quarterly":
-          {
-            return [4, 0.2635];
-          }
-        case "Monthly":
-          {
-            return [12, 0.0888];
-          }
-        default:
-          {
-            return [1, 1];
-          }
-      }
-    }
-    //
-
     //Calculate and Generate PDF
     void calculateAndPDF() {
       //Payor
@@ -282,6 +255,8 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                                     formLabel: "First Name",
                                     formInputType: TextInputType.name,
                                     formController: pFirstName,
+                                    maxLength: 10,
+                                    isRequired: false,
                                     errorVisible: false,
                                   ),
                                 ),
@@ -289,8 +264,10 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                                 Expanded(
                                   child: CustomTextField(
                                     formLabel: "Last Name",
+                                    maxLength: 10,
                                     formInputType: TextInputType.name,
                                     formController: pLastName,
+                                    isRequired: false,
                                     errorVisible: false,
                                   ),
                                 ),
@@ -333,6 +310,7 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                                     title: "Gender",
                                     value: pSelectedGender,
                                     errorVisible: false,
+                                    isRequired: true,
                                     items: genderTypes,
                                     onChange: (value) {
                                       setState(() {
@@ -346,6 +324,8 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                                     child: CustomTextField(
                                       formInputType: TextInputType.text,
                                       formLabel: "Occupation",
+                                      maxLength: 10,
+                                      isRequired: false,
                                       formController: pOccupation,
                                       errorVisible: false,
                                     ),
@@ -372,6 +352,8 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                               child: CustomTextField(
                                 formLabel: "First Name",
                                 formInputType: TextInputType.name,
+                                maxLength: 10,
+                                isRequired: false,
                                 formController: firstName,
                                 errorVisible: false,
                               ),
@@ -382,6 +364,8 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                                 formLabel: "Last Name",
                                 formInputType: TextInputType.name,
                                 formController: lastName,
+                                isRequired: false,
+                                maxLength: 10,
                                 errorVisible: false,
                               ),
                             ),
@@ -425,6 +409,7 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                                 child: CustomDropDown(
                               title: "Gender",
                               value: lSelectedGender,
+                              isRequired: true,
                               items: genderTypes,
                               errorVisible: false,
                               onChange: (value) {
@@ -439,6 +424,8 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                               child: CustomTextField(
                                 formInputType: TextInputType.text,
                                 formLabel: "Occupation",
+                                maxLength: 10,
+                                isRequired: false,
                                 formController: lOccupation,
                                 errorVisible: false,
                               ),
@@ -457,6 +444,7 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                               child: CustomDropDown(
                                 title: "Payment Mode",
                                 value: selectedMode,
+                                isRequired: true,
                                 errorVisible: false,
                                 items: paymentMode,
                                 onChange: (value) {
@@ -480,6 +468,8 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                         formLabel: "Premium Payable",
                         formInputType: TextInputType.number,
                         formController: premium,
+                        maxLength: 9,
+                        isRequired: true,
                         errorVisible: false,
                         onChange: (text) {
                           if (int.parse(policyYear.text) != null) {
@@ -500,6 +490,8 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                         formLabel: "Sum Assured",
                         formInputType: TextInputType.number,
                         formController: sumAssured,
+                        isRequired: true,
+                        maxLength: 10,
                         errorVisible: false,
                         onChange: (text) {
                           print(policyYear.text);
@@ -537,8 +529,8 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
                               sumAssured.text, premium.text, policyYear.text);
                           premiumValidation(premium.text);
                           ageValidation(age.text, pAge.text, policyYear.text);
-                          print(counter);
-                          if (counter == 4) {
+                          genderValidation(lSelectedGender, pSelectedGender);
+                          if (counter == 5) {
                             calculateAndPDF();
                           } else
                             showAlertDialog(context);
@@ -805,6 +797,19 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
       }
     }
   }
+  //
+
+  //Gender Validation
+  //Gender Emptiness Validation
+  void genderValidation(String lGenderText, String pGenderText) {
+    if (lGenderText == null || pGenderText == null) {
+      customDialogChildren.add(CustomDialogText(
+        description: "Gender field can't be empty",
+      ));
+    } else
+      counter++;
+  }
+  //
   //
 
   //Validate Premium

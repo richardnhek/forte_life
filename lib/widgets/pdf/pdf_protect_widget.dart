@@ -51,7 +51,6 @@ class PDFWidget {
     //Doubles with no previous values
     double accumulatedPremium = 0;
     double accumulatedPremiumNoRider = 0;
-    double totalSA = 0;
     double allCauses = 0;
     double allAccidents = 0;
     double cashValue = 0;
@@ -63,6 +62,7 @@ class PDFWidget {
     //Convert String to Double for ease of use
     double basicSANum = double.parse(basicSA);
     double premiumNum = double.parse(premium);
+    double yearlyNum = double.parse(premium);
     //
 
     //Doubles with conditions
@@ -85,10 +85,7 @@ class PDFWidget {
     String riderSAStr = riderSANum.toStringAsFixed(2);
     String premiumRiderStr = premiumRiderNum.toStringAsFixed(2);
     String totalPremiumStr = totalPremium.toStringAsFixed(2);
-    String accumulatedPremiumStr = totalPremium.toStringAsFixed(2);
     String cashValueStr = cashValue.toStringAsFixed(2);
-    String accumulatedPremiumNoRiderStr =
-        accumulatedPremiumNoRider.toStringAsFixed(2);
     //
 
     double getGSB() {
@@ -127,7 +124,7 @@ class PDFWidget {
           }
       }
       totalPremiumNum = (premiumNum + premiumRiderNum);
-      accumulatedPremiumNoRider += premiumNum;
+      accumulatedPremiumNoRider += yearlyNum;
       accumulatedPremium += totalPremiumNum;
       print(premiumNum);
       print(totalPremiumNum);
@@ -150,7 +147,7 @@ class PDFWidget {
             i++;
             allCauses = (basicSANum * 0.8) + riderSANum;
             allAccidents = (basicSANum * 1.6) + riderSANum;
-            accumulatedPremiumNoRider += premiumNum;
+            accumulatedPremiumNoRider += yearlyNum;
             accumulatedPremium += totalPremiumNum;
             dynamicRow.add([
               "$i",
@@ -165,7 +162,7 @@ class PDFWidget {
           {
             allCauses = (basicSANum * 0.8) + riderSANum;
             allAccidents = (basicSANum * 1.6) + riderSANum;
-            accumulatedPremiumNoRider += premiumNum;
+            accumulatedPremiumNoRider += yearlyNum;
             dynamicRow = [
               [
                 "$i",
@@ -202,7 +199,7 @@ class PDFWidget {
       while (i <= policyYear) {
         totalPremiumNum = (premiumNum + premiumRiderNum);
         accumulatedPremium += totalPremiumNum;
-        accumulatedPremiumNoRider += premiumNum;
+        accumulatedPremiumNoRider += yearlyNum;
         if (i >= 3) {
           if (i <= 16) {
             if (i <= 12)

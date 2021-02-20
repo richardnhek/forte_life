@@ -46,6 +46,7 @@ class PDFWidgetEdu {
 
     //Doubles with no previous values
     double accumulatedPremium = 0;
+    double accumulatedPremiumForCV = 0;
     double allCauses = 0;
     double cashValue = 0;
     //
@@ -53,6 +54,7 @@ class PDFWidgetEdu {
     //Convert String to Double for ease of use
     double basicSANum = double.parse(basicSA);
     double premiumNum = double.parse(premium);
+    double yearlyNum = double.parse(premium);
     //
 
     // Round all the doubles to a .00 decimal format
@@ -62,8 +64,6 @@ class PDFWidgetEdu {
     double halfPNum = double.parse(halfP);
     double quarterlyPNum = double.parse(quarterlyP);
     double monthlyPNum = double.parse(monthlyP);
-    String premiumStr = premiumNum.toStringAsFixed(2);
-    String accumulatedPremiumStr = premiumNum.toStringAsFixed(2);
     String cashValueStr = cashValue.toStringAsFixed(2);
     //
 
@@ -103,6 +103,7 @@ class PDFWidgetEdu {
           }
       }
       accumulatedPremium += premiumNum;
+      accumulatedPremiumForCV += yearlyNum;
       //All causes and accidents, List initialization
       switch (age) {
         case 1:
@@ -120,6 +121,7 @@ class PDFWidgetEdu {
             i++;
             allCauses = basicSANum * 0.8;
             accumulatedPremium += premiumNum;
+            accumulatedPremiumForCV += yearlyNum;
             dynamicRow.add([
               "$i",
               "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}     ",
@@ -165,7 +167,7 @@ class PDFWidgetEdu {
       allCauses = basicSANum;
       while (i <= policyYear) {
         accumulatedPremium += premiumNum;
-        accumulatedPremiumStr = accumulatedPremium.toStringAsFixed(2);
+        accumulatedPremiumForCV += yearlyNum;
         if (i >= 3) {
           if (i <= 16) {
             if (i <= 12)
@@ -173,7 +175,7 @@ class PDFWidgetEdu {
             else
               cashValPercentage += 0.1;
           }
-          cashValue = accumulatedPremium * cashValPercentage;
+          cashValue = accumulatedPremiumForCV * cashValPercentage;
           cashValueStr = cashValue.toStringAsFixed(2);
         } else
           cashValueStr = "-";

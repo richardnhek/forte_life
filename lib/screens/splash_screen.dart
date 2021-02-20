@@ -75,6 +75,24 @@ class _SplashScreenState extends State<SplashScreen>
         .asUint8List(dataBold.offsetInBytes, dataBold.lengthInBytes));
   }
 
+  Future<void> createPDFDir() async {
+    final protectFolder = "protect";
+    final educationFolder = "education";
+
+    final pathProtect = Directory(
+        "/storage/emulated/0/Android/data/com.reahu.forte_life/files/$protectFolder");
+    final pathEducation = Directory(
+        "/storage/emulated/0/Android/data/com.reahu.forte_life/files/$educationFolder");
+    if (await pathProtect.exists()) {
+      print("Protect Folder Already Created");
+    } else
+      pathProtect.create();
+    if (await pathEducation.exists()) {
+      print("Education Folder Already Created");
+    } else
+      pathEducation.create();
+  }
+
   void runAppInitialization() async {
     AppProvider appProvider = Provider.of(context, listen: false);
     appProvider.setAppOrientation();
@@ -82,6 +100,7 @@ class _SplashScreenState extends State<SplashScreen>
     await appProvider.requestPermissions();
     await getExternalStorageDirectory();
     await getImageFileFromAssets("assets/pictures/android/logo/logo.png");
+    await createPDFDir();
     await getFontFileFromAssets();
     await determineInitialRoute();
   }

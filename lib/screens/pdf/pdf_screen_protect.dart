@@ -5,7 +5,7 @@ import 'package:forte_life/providers/app_provider.dart';
 import 'package:forte_life/providers/parameters_provider.dart';
 import 'package:forte_life/screens/pdf/pdf_screen_protect_ui.dart';
 import 'package:forte_life/widgets/pdf/pdf_protect_widget.dart';
-import 'package:flutter/widgets.dart' as w;
+import 'package:flutter/widgets.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:provider/provider.dart';
 
@@ -39,7 +39,7 @@ class _PDFScreenProtectState extends State<PDFScreenProtect> {
   final file = File(
       "/storage/emulated/0/Android/data/com.reahu.forte_life/files/fortelife.pdf");
   @override
-  w.Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     ParametersProvider parametersProvider =
         Provider.of<ParametersProvider>(context);
     AppProvider appProvider = Provider.of<AppProvider>(context);
@@ -62,6 +62,8 @@ class _PDFScreenProtectState extends State<PDFScreenProtect> {
       parametersProvider.premiumRider,
       parametersProvider.riderSA,
     );
-    return PDFScreenProtectUI();
+    return PDFScreenProtectUI(
+      pdf: pdf,
+    );
   }
 }

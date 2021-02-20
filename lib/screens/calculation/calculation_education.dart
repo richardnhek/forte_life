@@ -23,7 +23,7 @@ class _CalculationEducationState extends State<CalculationEducation> {
 
     return WillPopScope(
         onWillPop: () async {
-          if (appProvider.categoriesTabIndex == 1) {
+          if (appProvider.categoriesTabIndex == 2) {
             appProvider.categoriesTabIndex = 0;
           }
         },

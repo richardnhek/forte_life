@@ -309,6 +309,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
       parametersProvider.annualP = premiumNum.toString();
       parametersProvider.basicSA = sumAssuredNum.toString();
       parametersProvider.paymentMode = selectedMode;
+      appProvider.pdfScreenIndex = 0;
       appProvider.activeTabIndex = 1;
       Navigator.of(context).pushNamed("/main_flow");
     }
@@ -355,6 +356,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                       formLabel: "First Name",
                                       formInputType: TextInputType.name,
                                       formController: pFirstName,
+                                      isRequired: false,
+                                      maxLength: 10,
                                       errorVisible: false,
                                     ),
                                   ),
@@ -362,6 +365,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                   Expanded(
                                     child: CustomTextField(
                                       formLabel: "Last Name",
+                                      maxLength: 10,
+                                      isRequired: false,
                                       formInputType: TextInputType.name,
                                       formController: pLastName,
                                       errorVisible: false,
@@ -404,6 +409,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                         child: CustomDropDown(
                                       title: "Gender",
                                       value: pSelectedGender,
+                                      isRequired: true,
                                       errorVisible: emptyGenderFieldP,
                                       items: genderTypes,
                                       onChange: (value) {
@@ -418,6 +424,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                       child: CustomTextField(
                                         formInputType: TextInputType.text,
                                         formLabel: "Occupation",
+                                        maxLength: 10,
+                                        isRequired: false,
                                         formController: pOccupation,
                                         errorVisible: false,
                                       ),
@@ -446,7 +454,9 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                               child: CustomTextField(
                                 formLabel: "First Name",
                                 formInputType: TextInputType.name,
+                                isRequired: false,
                                 formController: firstName,
+                                maxLength: 10,
                                 errorVisible: false,
                               ),
                             ),
@@ -456,6 +466,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                 formLabel: "Last Name",
                                 formInputType: TextInputType.name,
                                 formController: lastName,
+                                isRequired: false,
+                                maxLength: 10,
                                 errorVisible: false,
                               ),
                             ),
@@ -496,6 +508,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                               title: "Gender",
                               value: lSelectedGender,
                               items: genderTypes,
+                              isRequired: true,
                               errorVisible: emptyGenderField,
                               onChange: (value) {
                                 setState(() {
@@ -509,6 +522,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                               child: CustomTextField(
                                 formInputType: TextInputType.text,
                                 formLabel: "Occupation",
+                                maxLength: 10,
+                                isRequired: false,
                                 formController: lOccupation,
                                 errorVisible: false,
                               ),
@@ -527,37 +542,12 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                               child: CustomDropDown(
                                 title: "Payment Mode",
                                 value: selectedMode,
+                                isRequired: true,
                                 errorVisible: false,
                                 items: paymentMode,
                                 onChange: (value) {
                                   setState(() {
                                     selectedMode = value;
-                                    if ((premium.text.isNotEmpty ||
-                                            sumAssured.text.isNotEmpty) &&
-                                        (selectedYear != null)) {
-                                      if (premium.text.isNotEmpty) {
-                                        premiumNum = double.parse(premium.text);
-                                        sumAssured.text = ((((double.parse(
-                                                            premium.text) /
-                                                        (paymentModeValue(
-                                                                    selectedMode)[
-                                                                1] *
-                                                            paymentModeValue(
-                                                                    selectedMode)[
-                                                                0])) *
-                                                    selectedYear.toDouble())) *
-                                                paymentModeValue(
-                                                    selectedMode)[0])
-                                            .toStringAsFixed(2);
-                                      } else if (sumAssured.text.isNotEmpty) {
-                                        premiumNum = (double.parse(
-                                                    sumAssured.text) /
-                                                selectedYear.toDouble()) *
-                                            paymentModeValue(selectedMode)[1];
-                                        premium.text =
-                                            premiumNum.toStringAsFixed(2);
-                                      }
-                                    }
                                   });
                                 },
                               ),
@@ -568,6 +558,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                               child: CustomDropDown(
                                 title: "Policy Year",
                                 value: selectedYear,
+                                isRequired: true,
                                 items: policyYears,
                                 errorVisible: false,
                                 onChange: (value) {
@@ -600,6 +591,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                         formLabel: "Premium Payable",
                         formInputType: TextInputType.number,
                         formController: premium,
+                        maxLength: 9,
+                        isRequired: true,
                         errorVisible: emptyPremiumField,
                         onChange: (text) {
                           if (selectedYear != null) {
@@ -618,17 +611,19 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                         formLabel: "Sum Assured",
                         formInputType: TextInputType.number,
                         formController: sumAssured,
+                        isRequired: true,
+                        maxLength: 10,
                         errorVisible: emptySumField,
                         onChange: (text) {
                           if (selectedYear != null) {
-                            if (text == "") {
-                              premium.text = "";
+                            if (text.toString().isEmpty) {
+                              premium.clear();
                             } else
                               sumAssuredNum = double.parse(text);
                             premiumNum = sumAssuredNum / selectedYear;
                             premium.text = premiumNum.toStringAsFixed(2);
                           } else {
-                            premium.text = null;
+                            premium.clear();
                           }
                         },
                       ),
@@ -651,6 +646,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                       child: CustomTextField(
                         formInputType: TextInputType.number,
                         formLabel: "Added Rider",
+                        isRequired: true,
+                        maxLength: 10,
                         formController: riderAdded,
                         errorVisible: false,
                       ),
@@ -670,15 +667,16 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                               sumAssuredValidation(
                                   sumAssured.text, selectedYear);
                               premiumValidation(premium.text);
-                              ageValidation(
-                                  age.text, pAge.text, selectedYear, true);
+                              ageValidation(age.text, pAge.text, selectedYear,
+                                  true, true);
                               addedRiderValidation(
                                   riderAdded.text, sumAssured.text);
-                              genderValidation(pSelectedGender);
+                              genderValidation(
+                                  lSelectedGender, pSelectedGender, true);
                               print(counter);
                               if (counter == 6) {
-                                await getRate(isMale(pSelectedGender),
-                                    int.parse(pAge.text), selectedYear);
+                                await getRate(isMale(lSelectedGender),
+                                    int.parse(age.text), selectedYear);
                                 calculateAndPDF();
                               } else
                                 showAlertDialog(context);
@@ -686,9 +684,11 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                               sumAssuredValidation(
                                   sumAssured.text, selectedYear);
                               premiumValidation(premium.text);
-                              ageValidation(
-                                  age.text, pAge.text, selectedYear, true);
-                              if (counter == 4) {
+                              ageValidation(age.text, pAge.text, selectedYear,
+                                  true, false);
+                              genderValidation(
+                                  lSelectedGender, pSelectedGender, true);
+                              if (counter == 5) {
                                 calculateAndPDF();
                               } else
                                 showAlertDialog(context);
@@ -698,12 +698,12 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                               sumAssuredValidation(
                                   sumAssured.text, selectedYear);
                               premiumValidation(premium.text);
-                              ageValidation(
-                                  age.text, pAge.text, selectedYear, false);
+                              ageValidation(age.text, pAge.text, selectedYear,
+                                  false, true);
                               addedRiderValidation(
                                   riderAdded.text, sumAssured.text);
-                              genderValidation(lSelectedGender);
-                              print(lSelectedGender);
+                              genderValidation(
+                                  lSelectedGender, pSelectedGender, false);
                               if (counter == 5) {
                                 await getRate(isMale(lSelectedGender),
                                     int.parse(age.text), selectedYear);
@@ -714,10 +714,11 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                               sumAssuredValidation(
                                   sumAssured.text, selectedYear);
                               premiumValidation(premium.text);
-                              ageValidation(
-                                  age.text, pAge.text, selectedYear, false);
-                              print(counter);
-                              if (counter == 3) {
+                              ageValidation(age.text, pAge.text, selectedYear,
+                                  false, false);
+                              genderValidation(
+                                  lSelectedGender, pSelectedGender, false);
+                              if (counter == 4) {
                                 calculateAndPDF();
                               } else
                                 showAlertDialog(context);
@@ -837,8 +838,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   //
 
   //Validate Age
-  void ageValidation(
-      String ageText, String pAgeText, int policyTerm, bool isDifferentPerson) {
+  void ageValidation(String ageText, String pAgeText, int policyTerm,
+      bool isDifferentPerson, bool isAddRider) {
     if (isDifferentPerson == false) {
       if (ageText.isEmpty) {
         customDialogChildren.add(CustomDialogText(
@@ -863,10 +864,12 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
           description: "Age field can't be empty",
         ));
       } else {
-        if (((int.parse(pAgeText) + policyTerm) > 69) ||
+        if (((int.parse(ageText) + policyTerm) > 69) ||
             (int.parse(pAgeText) < 18) ||
-            (int.parse(ageText) < 1)) {
-          if ((int.parse(pAgeText) + policyTerm) > 69) {
+            (isAddRider == false && int.parse(ageText) < 1) ||
+            int.parse(ageText) > 59 ||
+            (isAddRider == true && (int.parse(ageText) < 18))) {
+          if ((int.parse(ageText) + policyTerm) > 69) {
             customDialogChildren.add(CustomDialogText(
               description: "Age limit exceeded, please check information page.",
             ));
@@ -876,9 +879,21 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
               description: "Age under 18, please check information page",
             ));
           }
-          if (int.parse(ageText) < 1) {
+          if (isAddRider == false && (int.parse(ageText) < 1)) {
             customDialogChildren.add(CustomDialogText(
-              description: "Child's age must be at least 1 year old",
+              description: "Life Proposed's age must be at least 1 year old",
+            ));
+          }
+          if (isAddRider == true && (int.parse(ageText) < 18)) {
+            customDialogChildren.add(CustomDialogText(
+              description:
+                  "Life Proposed's age must be at least 18 years old to add rider",
+            ));
+          }
+          if (int.parse(ageText) > 59) {
+            customDialogChildren.add(CustomDialogText(
+              description:
+                  "Life Proposed's age is limited to at most 59 years old",
             ));
           }
         } else {
@@ -1041,21 +1056,27 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   }
   //
 
-  Future<bool> getAddRider(bool isAddRider) async {
-    return isAddRider;
-  }
-
   //Gender Emptiness Validation
-  void genderValidation(String genderText) {
-    if (genderText == null) {
-      customDialogChildren.add(CustomDialogText(
-        description: "Gender field can't be empty",
-      ));
-    } else
-      counter++;
+  void genderValidation(
+      String lGenderText, String pGenderText, bool isDifferentPerson) {
+    if (isDifferentPerson) {
+      if (lGenderText == null || pGenderText == null) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Gender field can't be empty",
+        ));
+      } else
+        counter++;
+    } else {
+      if (lGenderText == null) {
+        customDialogChildren.add(CustomDialogText(
+          description: "Gender field can't be empty",
+        ));
+      } else
+        counter++;
+    }
   }
-
   //
+
   //Validate Gender
   bool isMale(String selectedGender) {
     if (selectedGender == "Male") {
