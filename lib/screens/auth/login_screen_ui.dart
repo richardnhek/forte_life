@@ -7,12 +7,21 @@ import 'package:forte_life/providers/app_provider.dart';
 import 'package:forte_life/widgets/password_field.dart';
 
 class LoginScreenUI extends StatelessWidget {
+  LoginScreenUI(
+      {this.usernameController,
+      this.passwordController,
+      this.onSignInPress,
+      this.scaffoldKey});
+
+  final TextEditingController usernameController;
+  final TextEditingController passwordController;
+  final Function onSignInPress;
+  final scaffoldKey;
+
   @override
   Widget build(BuildContext context) {
     AppProvider appProvider = Provider.of<AppProvider>(context, listen: false);
     final mq = MediaQuery.of(context);
-    TextEditingController usrName = TextEditingController();
-    TextEditingController passWrd = TextEditingController();
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -56,15 +65,16 @@ class LoginScreenUI extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 300,
-                  height: 52,
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage(
-                              "assets/pictures/android/logo/logo.png"),
-                          fit: BoxFit.contain)),
+                ConstrainedBox(
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage(
+                                "assets/pictures/android/logo/logo.png"),
+                            fit: BoxFit.contain)),
+                  ),
+                  constraints: BoxConstraints(maxWidth: 300, maxHeight: 52),
                 ),
                 SizedBox(
                   height: DeviceUtils.getResponsive(
@@ -75,14 +85,14 @@ class LoginScreenUI extends StatelessWidget {
                 ),
                 UserNameField(
                   hintText: "Username",
-                  tec: usrName,
+                  tec: usernameController,
                 ),
                 SizedBox(
                   height: 16,
                 ),
                 PasswordField(
                   hintText: "Password",
-                  tec: passWrd,
+                  tec: passwordController,
                 ),
                 SizedBox(
                   height: 32,
@@ -98,9 +108,7 @@ class LoginScreenUI extends StatelessWidget {
                           colors: [Color(0xFF6ABFBC), Color(0xFF8AB84B)])),
                   child: FlatButton(
                     padding: EdgeInsets.all(10),
-                    onPressed: () => {
-                      {Navigator.pushNamed(context, "/main_flow")}
-                    },
+                    onPressed: () => onSignInPress(context),
                     child: Text(
                       "Login",
                       style: TextStyle(

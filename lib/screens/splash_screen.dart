@@ -1,10 +1,14 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:forte_life/constants/constants.dart';
 import 'package:forte_life/providers/app_provider.dart';
+import 'package:forte_life/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -16,10 +20,13 @@ class _SplashScreenState extends State<SplashScreen>
   AnimationController animationController;
   Animation<double> animation;
   CurvedAnimation curveAnimation;
+  SharedPreferences prefs;
+  AppProvider appProvider;
   final splashDelay = 8;
 
   @override
   void initState() {
+    super.initState();
     animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 1600),
@@ -44,11 +51,27 @@ class _SplashScreenState extends State<SplashScreen>
 
     animationController.forward();
     runAppInitialization();
-    super.initState();
   }
 
   Future<void> determineInitialRoute() async {
     Navigator.pushNamed(context, "/login");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String accessToken = prefs.getString(APP_ACCESS_TOKEN) ?? '';
+
+    if (accessToken.isEmpty) {
+      Navigator.of(context).pushReplacementNamed("/login");
+    } else {
+      print(accessToken);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      try {
+        await authProvider.getCurrentUser(token: accessToken);
+        print("what's wrong");
+        Navigator.of(context).pushReplacementNamed('/main_flow');
+      } on DioError catch (error) {
+        print('error $error');
+      }
+    }
   }
 
   Future<void> getImageFileFromAssets(String path) async {

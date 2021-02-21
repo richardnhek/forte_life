@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forte_life/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_provider.dart';
 import 'providers/parameters_provider.dart';
@@ -18,6 +19,9 @@ class MyApp extends StatelessWidget {
       ),
       ChangeNotifierProvider(
         create: (_) => ParametersProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => AuthProvider(),
       )
     ], child: AppController());
   }

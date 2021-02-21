@@ -60,6 +60,8 @@ class _PDFScreenEduState extends State<PDFScreenEdu> {
       parametersProvider.paymentMode,
       parametersProvider.annualP,
     );
-    return PDFScreenEducationUI();
+    return PDFScreenEducationUI(
+      pdf: pdf,
+    );
   }
 }

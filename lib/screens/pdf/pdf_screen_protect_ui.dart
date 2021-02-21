@@ -91,8 +91,10 @@ class _PDFScreenProtectUIState extends State<PDFScreenProtectUI> {
                     "/storage/emulated/0/Android/data/com.reahu.forte_life/files/protect/${fileName.text}.pdf");
                 if (await newFile.exists()) {
                   print("File Already Exists");
-                } else
+                } else {
                   savePDF(newFile, widget.pdf);
+                  Navigator.of(context).pop();
+                }
               } else
                 print("Error No File Name");
             },

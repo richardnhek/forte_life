@@ -29,7 +29,8 @@ class _InfoScreenState extends State<InfoScreen> {
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
                   border: Border.all(color: Color(0xFF8AB84B)),
-                  borderRadius: BorderRadius.circular(5)),
+                  borderRadius: BorderRadius.circular(5),
+                  image: DecorationImage(image: AssetImage(""))),
               child: Column(
                 children: [
                   BulletPoint(
