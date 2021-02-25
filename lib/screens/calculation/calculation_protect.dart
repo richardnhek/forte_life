@@ -1,6 +1,8 @@
+import 'package:align_positioned/align_positioned.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:forte_life/providers/app_provider.dart';
+import 'package:forte_life/widgets/custom_alert_dialog.dart';
 import 'package:forte_life/widgets/tab_button.dart';
 import 'calculation_protect_ui.dart';
 import 'package:forte_life/screens/info/info_screen.dart';
@@ -19,18 +21,38 @@ class _CalculationProtectState extends State<CalculationProtect> {
     AppProvider appProvider = Provider.of<AppProvider>(context);
     final mq = MediaQuery.of(context);
 
+    void _showExitDialog() {
+      showDialog(
+          context: context,
+          builder: (ctx) => Center(
+                child: CustomAlertDialog(
+                  title: "Exit",
+                  icon: Image.asset("assets/icons/attention.png",
+                      width: 60, height: 60),
+                  details: "Are you sure you want to leave this page?",
+                  actionButtonTitle: "No",
+                  actionButtonTitleTwo: "Yes",
+                  isPrompt: true,
+                  onActionButtonPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  onActionButtonPressedTwo: () {
+                    Navigator.of(context).pop();
+                    appProvider.categoriesTabIndex = 0;
+                  },
+                ),
+              ));
+    }
+
     return WillPopScope(
         onWillPop: () async {
-          if (appProvider.categoriesTabIndex == 1) {
-            appProvider.categoriesTabIndex = 0;
-          }
+          _showExitDialog();
         },
-        child: Stack(
-          children: [
-            Scaffold(
-              body: tabs[appProvider.calculationPage],
-            ),
+        child: Scaffold(
+          body: Stack(children: [
+            tabs[appProvider.calculationPage],
             Container(
+              padding: EdgeInsets.symmetric(horizontal: 40),
               height: mq.size.height / 7,
               decoration: BoxDecoration(color: Colors.white, boxShadow: [
                 BoxShadow(
@@ -39,7 +61,6 @@ class _CalculationProtectState extends State<CalculationProtect> {
                     blurRadius: 5)
               ]),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
                     child: Container(
@@ -57,24 +78,43 @@ class _CalculationProtectState extends State<CalculationProtect> {
                       ),
                     ),
                   ),
-                  Container(
-                    child: TabButton(
-                      width: mq.size.width / 2,
-                      height: mq.size.height / 10,
-                      tabTitle: "Information",
-                      icon: Icons.info_outline,
-                      isActive: appProvider.calculationPage == 1,
-                      onPressed: () {
-                        setState(() {
-                          appProvider.calculationPage = 1;
-                        });
-                      },
+                  Expanded(
+                    child: Container(
+                      child: TabButton(
+                        width: mq.size.width / 2,
+                        height: mq.size.height / 10,
+                        tabTitle: "Information",
+                        icon: Icons.info_outline,
+                        isActive: appProvider.calculationPage == 1,
+                        onPressed: () {
+                          setState(() {
+                            appProvider.calculationPage = 1;
+                          });
+                        },
+                      ),
                     ),
                   )
                 ],
               ),
             )
-          ],
+          ]),
+          floatingActionButton: AlignPositioned(
+            alignment: Alignment.topLeft,
+            dy: mq.size.height / 13.5,
+            dx: mq.size.width / 20,
+            child: FloatingActionButton(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.black,
+                size: 32,
+              ),
+              onPressed: () {
+                _showExitDialog();
+              },
+            ),
+          ),
         ));
   }
 }

@@ -1,4 +1,3 @@
-import 'package:excel/excel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +7,6 @@ import 'package:forte_life/widgets/calculate_button.dart';
 import 'package:forte_life/widgets/custom_datepicker.dart';
 import 'package:forte_life/widgets/custom_dialogtext.dart';
 import 'package:forte_life/widgets/custom_dropdown.dart';
-import 'package:forte_life/widgets/custom_switch.dart';
 import 'package:forte_life/widgets/custom_text_field.dart';
 import 'package:forte_life/widgets/dropdown_text.dart';
 import 'package:forte_life/widgets/field_title.dart';
@@ -43,14 +41,14 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
   //Child
   TextEditingController firstName = TextEditingController();
   TextEditingController lastName = TextEditingController();
-  TextEditingController age = new TextEditingController();
-  TextEditingController dob = new TextEditingController();
-  TextEditingController sumAssured = new TextEditingController();
-  TextEditingController premium = new TextEditingController();
+  TextEditingController age = TextEditingController();
+  TextEditingController dob = TextEditingController();
+  TextEditingController sumAssured = TextEditingController();
+  TextEditingController premium = TextEditingController();
   TextEditingController gender = TextEditingController();
   TextEditingController lOccupation = TextEditingController();
   TextEditingController policyYear = TextEditingController();
-  TextEditingController riderAdded = new TextEditingController();
+  TextEditingController riderAdded = TextEditingController();
   //
 
   String lSelectedGender;
@@ -58,6 +56,8 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
   String selectedMode = "Yearly";
   double premiumNum;
   double sumAssuredNum;
+  DateTime lpBirthDate;
+  bool isOnPolicy = false;
 
   //Necessary error variables
   int counter;
@@ -219,6 +219,7 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
       parametersProvider.paymentMode = selectedMode;
       parametersProvider.annualP = premiumNum.toString();
       parametersProvider.basicSA = sumAssuredNum.toString();
+      parametersProvider.isOnPolicy = isOnPolicy;
       appProvider.pdfScreenIndex = 1;
       appProvider.activeTabIndex = 1;
       Navigator.of(context).pushNamed("/main_flow");
@@ -635,6 +636,7 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
     }
     if (isLpAge) {
       policyYear.text = (18 - age).toString();
+      lpBirthDate = birthDate;
       sumAssured.clear();
       premium.clear();
     }
@@ -649,6 +651,16 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
     final DateTime displayDate = displayFormatter.parse(date);
     final String formatted = serverFormatter.format(displayDate);
     return formatted;
+  }
+  //
+
+  //Check whether the birthdate is before or after the date the plan is bought
+  bool isOnPolicyStatus(DateTime birthDate) {
+    if (birthDate.month == _currentDate.month &&
+        birthDate.day == _currentDate.day)
+      return true;
+    else
+      return false;
   }
   //
 
@@ -670,6 +682,7 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
           description: "Payor's age under 18, please check information page",
         ));
       } else {
+        isOnPolicy = isOnPolicyStatus(lpBirthDate);
         counter++;
       }
     }
@@ -799,7 +812,6 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
   }
   //
 
-  //Gender Validation
   //Gender Emptiness Validation
   void genderValidation(String lGenderText, String pGenderText) {
     if (lGenderText == null || pGenderText == null) {
@@ -809,7 +821,6 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
     } else
       counter++;
   }
-  //
   //
 
   //Validate Premium
@@ -836,8 +847,12 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
         counter++;
     }
   }
-  //
 
+  //
+  @override
+  void dispose() {
+    super.dispose();
+  }
 }
 
 class AlwaysDisabledFocusNode extends FocusNode {

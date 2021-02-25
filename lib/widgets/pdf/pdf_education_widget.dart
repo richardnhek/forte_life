@@ -7,20 +7,20 @@ import 'dart:io';
 
 class PDFWidgetEdu {
   Document createPDF(
-    String title,
-    String lpName,
-    String lpAge,
-    String lpGender,
-    String lpOccupation,
-    String pName,
-    String pAge,
-    String pGender,
-    String pOccupation,
-    String basicSA,
-    String policyTerm,
-    String paymentMode,
-    String premium,
-  ) {
+      String title,
+      String lpName,
+      String lpAge,
+      String lpGender,
+      String lpOccupation,
+      String pName,
+      String pAge,
+      String pGender,
+      String pOccupation,
+      String basicSA,
+      String policyTerm,
+      String paymentMode,
+      String premium,
+      bool isOnPolicy) {
     //Final variables
     final file = File(
             "/storage/emulated/0/Android/data/com.reahu.forte_life/files/logo.png")
@@ -104,16 +104,45 @@ class PDFWidgetEdu {
       }
       accumulatedPremium += premiumNum;
       accumulatedPremiumForCV += yearlyNum;
+      if (isOnPolicy == false) {
+        age += 1;
+      }
       //All causes and accidents, List initialization
       switch (age) {
         case 1:
+          {
+            allCauses = basicSANum * 0.4;
+            dynamicRow = [
+              [
+                "$i",
+                "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}     ",
+                "${allCauses.toStringAsFixed(2)}",
+                "-",
+                "-"
+              ],
+            ];
+            i++;
+            allCauses = basicSANum * 0.6;
+            accumulatedPremium += premiumNum;
+            accumulatedPremiumForCV += yearlyNum;
+            dynamicRow.add([
+              "$i",
+              "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}     ",
+              "${allCauses.toStringAsFixed(2)}",
+              "-",
+              "-"
+            ]);
+            allCauses = basicSANum * 0.8;
+            break;
+          }
+        case 2:
           {
             allCauses = basicSANum * 0.6;
             dynamicRow = [
               [
                 "$i",
                 "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}     ",
-                "$allCauses",
+                "${allCauses.toStringAsFixed(2)}",
                 "-",
                 "-"
               ],
@@ -125,25 +154,26 @@ class PDFWidgetEdu {
             dynamicRow.add([
               "$i",
               "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}     ",
-              "$allCauses",
+              "${allCauses.toStringAsFixed(2)}",
               "-",
               "-"
             ]);
+            allCauses = basicSANum;
             break;
           }
-        case 2:
+        case 3:
           {
             allCauses = basicSANum * 0.8;
             dynamicRow = [
               [
                 "$i",
                 "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}     ",
-                "$allCauses",
+                "${allCauses.toStringAsFixed(2)}",
                 "-",
                 "-"
               ],
             ];
-
+            allCauses = basicSANum;
             break;
           }
 
@@ -154,7 +184,7 @@ class PDFWidgetEdu {
               [
                 "$i",
                 "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}     ",
-                "$allCauses",
+                "${allCauses.toStringAsFixed(2)}",
                 "-",
                 "-"
               ]
@@ -164,11 +194,14 @@ class PDFWidgetEdu {
       }
       //
       i++;
-      allCauses = basicSANum;
       while (i <= policyYear) {
         accumulatedPremium += premiumNum;
         accumulatedPremiumForCV += yearlyNum;
+
         if (i >= 3) {
+          if (i == 4) {
+            allCauses = basicSANum;
+          }
           if (i <= 16) {
             if (i <= 12)
               cashValPercentage += 0.05;
@@ -183,7 +216,7 @@ class PDFWidgetEdu {
           dynamicRow.add([
             "$i",
             "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}      ",
-            "$allCauses",
+            "${allCauses.toStringAsFixed(2)}",
             cashValueStr,
             "          -                              -                             -         "
           ]);
@@ -192,7 +225,7 @@ class PDFWidgetEdu {
           dynamicRow.add([
             "$i",
             "         $premiumNum              ${accumulatedPremium.toStringAsFixed(2)}     ",
-            "$allCauses",
+            "${allCauses.toStringAsFixed(2)}",
             cashValue.round().toStringAsFixed(2),
             "${basicSANum.toStringAsFixed(2)}                        ${getGSB()}                           ${basicSANum + getGSB()}"
           ]);
@@ -207,7 +240,7 @@ class PDFWidgetEdu {
       List<String> dynamicHeader = [
         "End of Policy Year",
         "                 Premium (USD) \n \n         Annualized     Accumulated",
-        "     Total Death/TPD (USD) \n \n              All Causes          ",
+        "           Death/TPD (USD) \n \n              All Causes          ",
         "     Cash \n    Value",
         "    Guaranteed               Guaranteed             Total Maturity    \n Maturity Benefit         Special Benefit                Benefit  "
       ];
@@ -311,7 +344,7 @@ class PDFWidgetEdu {
                                       padding: EdgeInsets.only(left: 5),
                                       child: Container(
                                           width: 100,
-                                          child: Text("Proposer",
+                                          child: Text("Payor",
                                               style: TextStyle(
                                                   font: regularF,
                                                   fontSize: 7)))),

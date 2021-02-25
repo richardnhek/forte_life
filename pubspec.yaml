@@ -37,6 +37,9 @@ dependencies:
   align_positioned: ^1.2.15
   dio: 3.0.9
   shared_preferences: 0.5.12
+  flutter_local_notifications: ^4.0.1+1
+  double_back_to_close_app: ^1.2.0
+
 
 
 
@@ -71,8 +74,10 @@ flutter:
     - assets/pictures/android/gradient1.png
     - assets/pictures/android/gradient2.png
     - assets/pictures/android/gradient3.png
+    - assets/pictures/android/gradient3_test.png
     - assets/rate/rate.xlsx
     - assets/icons/attention.png
+    - assets/icons/agent.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -32,11 +32,7 @@ class LoginScreenUI extends StatelessWidget {
           Expanded(
             child: Container(
               width: double.infinity,
-              height: DeviceUtils.getResponsive(
-                  appProvider: appProvider,
-                  mq: mq,
-                  onPhone: mq.size.height / 4,
-                  onTablet: mq.size.height / 4),
+              height: mq.size.height / 4,
               decoration: BoxDecoration(
                   image: DecorationImage(
                       image:
@@ -45,22 +41,7 @@ class LoginScreenUI extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(
-                left: DeviceUtils.getResponsive(
-                    appProvider: appProvider,
-                    mq: mq,
-                    onPhone: mq.size.width / 8,
-                    onTablet: mq.size.width / 8),
-                right: DeviceUtils.getResponsive(
-                    appProvider: appProvider,
-                    mq: mq,
-                    onPhone: mq.size.width / 8,
-                    onTablet: mq.size.width / 8),
-                bottom: DeviceUtils.getResponsive(
-                    appProvider: appProvider,
-                    mq: mq,
-                    onPhone: 0.0,
-                    onTablet: 0.0)),
+            padding: EdgeInsets.symmetric(horizontal: mq.size.width / 8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,11 +106,7 @@ class LoginScreenUI extends StatelessWidget {
           Expanded(
             child: Container(
               width: double.infinity,
-              height: DeviceUtils.getResponsive(
-                  appProvider: appProvider,
-                  mq: mq,
-                  onPhone: mq.size.height / 4,
-                  onTablet: mq.size.height / 4),
+              height: mq.size.height / 4,
               decoration: BoxDecoration(
                   image: DecorationImage(
                       image:

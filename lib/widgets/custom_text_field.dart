@@ -13,6 +13,7 @@ class CustomTextField extends StatelessWidget {
       this.validateFunc,
       this.errorVisible,
       this.isRequired,
+      this.onSubmitted,
       this.maxLength});
 
   final String formLabel;
@@ -20,6 +21,7 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController formController;
   final Function onChange;
   final Function onSaved;
+  final Function onSubmitted;
   final Function validateFunc;
   final bool errorVisible;
   final bool isRequired;
@@ -45,6 +47,7 @@ class CustomTextField extends StatelessWidget {
             inputFormatters: [
               LengthLimitingTextInputFormatter(maxLength),
             ],
+            onFieldSubmitted: onSubmitted,
             onSaved: onSaved,
             maxLines: 1,
             onChanged: onChange,

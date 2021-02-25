@@ -80,6 +80,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   double premiumNum;
   double sumAssuredNum;
   double premiumRider;
+  DateTime lpBirthDate;
+  bool isOnPolicy = false;
 
   List<Widget> customDialogChildren = List();
 
@@ -134,8 +136,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   //
 
   //Reg
-  static final RegExp nameRegExp = RegExp('[a-zA-Z]');
-  static final RegExp numberRegExp = RegExp(r'\d');
+  // static final RegExp nameRegExp = RegExp('[a-zA-Z]');
+  // static final RegExp numberRegExp = RegExp(r'\d');
   //
 
   @override
@@ -237,32 +239,32 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
     }
     //
 
-    //Get each value of each Payment Mode
-    List<double> paymentModeValue(String selectedMode) {
-      switch (selectedMode) {
-        case "Yearly":
-          {
-            return [1, 1];
-          }
-        case "Half-yearly":
-          {
-            return [2, 0.5178];
-          }
-        case "Quarterly":
-          {
-            return [4, 0.2635];
-          }
-        case "Monthly":
-          {
-            return [12, 0.0888];
-          }
-        default:
-          {
-            return [1, 1];
-          }
-      }
-    }
-    //
+    // //Get each value of each Payment Mode
+    // List<double> paymentModeValue(String selectedMode) {
+    //   switch (selectedMode) {
+    //     case "Yearly":
+    //       {
+    //         return [1, 1];
+    //       }
+    //     case "Half-yearly":
+    //       {
+    //         return [2, 0.5178];
+    //       }
+    //     case "Quarterly":
+    //       {
+    //         return [4, 0.2635];
+    //       }
+    //     case "Monthly":
+    //       {
+    //         return [12, 0.0888];
+    //       }
+    //     default:
+    //       {
+    //         return [1, 1];
+    //       }
+    //   }
+    // }
+    // //
 
     //Calculate and Generate PDF
     void calculateAndPDF() {
@@ -309,6 +311,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
       parametersProvider.annualP = premiumNum.toString();
       parametersProvider.basicSA = sumAssuredNum.toString();
       parametersProvider.paymentMode = selectedMode;
+      parametersProvider.isOnPolicy = isOnPolicy;
       appProvider.pdfScreenIndex = 0;
       appProvider.activeTabIndex = 1;
       Navigator.of(context).pushNamed("/main_flow");
@@ -392,7 +395,8 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                         focusNode: AlwaysDisabledFocusNode(),
                                         dob: pDob,
                                         onTap: () {
-                                          _selectDate(context, pDob, pAge);
+                                          _selectDate(
+                                              context, pDob, pAge, false);
                                         },
                                       )),
                                 ],
@@ -491,7 +495,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
                                   focusNode: AlwaysDisabledFocusNode(),
                                   dob: dob,
                                   onTap: () {
-                                    _selectDate(context, dob, age);
+                                    _selectDate(context, dob, age, true);
                                   },
                                 )),
                           ],
@@ -775,7 +779,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
 
   // Date Picker Function
   _selectDate(BuildContext context, TextEditingController tec,
-      TextEditingController tecAge) async {
+      TextEditingController tecAge, bool isLpAge) async {
     DateTime newSelectedDate = await showDatePicker(
         context: context,
         initialDate: _selectedDate != null ? _selectedDate : DateTime.now(),
@@ -803,14 +807,14 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
         tec.text = convertDateTimeDisplay(dateTime);
         tec.selection = TextSelection.fromPosition(TextPosition(
             offset: dob.text.length, affinity: TextAffinity.upstream));
-        tecAge.text = calculateAge(_selectedDate);
+        tecAge.text = calculateAge(_selectedDate, isLpAge);
       });
     }
   }
 //
 
 // Calculate age from datepicker
-  calculateAge(DateTime birthDate) {
+  calculateAge(DateTime birthDate, bool isLpAge) {
     int age = _currentDate.year - birthDate.year;
     int month1 = _currentDate.month;
     int month2 = birthDate.month;
@@ -823,6 +827,12 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
         age--;
       }
     }
+    if (isLpAge) {
+      policyYear.text = (18 - age).toString();
+      lpBirthDate = birthDate;
+      sumAssured.clear();
+      premium.clear();
+    }
     return age.toString();
   }
   //
@@ -834,6 +844,16 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
     final DateTime displayDate = displayFormatter.parse(date);
     final String formatted = serverFormatter.format(displayDate);
     return formatted;
+  }
+  //
+
+  //Check whether the birthdate is before or after the date the plan is bought
+  bool isOnPolicyStatus(DateTime birthDate) {
+    if (birthDate.month == _currentDate.month &&
+        birthDate.day == _currentDate.day)
+      return true;
+    else
+      return false;
   }
   //
 
@@ -897,6 +917,7 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
             ));
           }
         } else {
+          isOnPolicy = isOnPolicyStatus(lpBirthDate);
           counter += 2;
         }
       }
@@ -1087,6 +1108,10 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
   }
   //
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
 }
 
 class AlwaysDisabledFocusNode extends FocusNode {

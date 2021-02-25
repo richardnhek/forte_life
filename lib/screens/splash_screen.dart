@@ -57,17 +57,16 @@ class _SplashScreenState extends State<SplashScreen>
     Navigator.pushNamed(context, "/login");
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    // prefs.remove(APP_ACCESS_TOKEN);
     String accessToken = prefs.getString(APP_ACCESS_TOKEN) ?? '';
 
     if (accessToken.isEmpty) {
       Navigator.of(context).pushReplacementNamed("/login");
     } else {
-      print(accessToken);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       try {
         await authProvider.getCurrentUser(token: accessToken);
-        print("what's wrong");
-        Navigator.of(context).pushReplacementNamed('/main_flow');
+        Navigator.pushNamedAndRemoveUntil(context, '/main_flow', (_) => false);
       } on DioError catch (error) {
         print('error $error');
       }

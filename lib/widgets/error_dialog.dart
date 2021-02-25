@@ -16,7 +16,9 @@ class ErrorDialog extends StatelessWidget {
       icon: Image.asset("assets/icons/attention.png", width: 60, height: 60),
       title: "Error",
       details: details,
+      isPrompt: false,
       actionButtonTitle: "OK",
+      actionButtonTitleTwo: " ",
       onActionButtonPressed: onActionButtonPressed,
     );
   }

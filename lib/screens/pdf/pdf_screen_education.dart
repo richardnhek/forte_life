@@ -1,12 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:forte_life/providers/app_provider.dart';
 import 'package:forte_life/providers/parameters_provider.dart';
 import 'package:forte_life/screens/pdf/pdf_screen_education_ui.dart';
-import 'package:forte_life/screens/pdf/pdf_screen_protect_ui.dart';
 import 'package:forte_life/widgets/pdf/pdf_education_widget.dart';
-import 'package:forte_life/widgets/pdf/pdf_protect_widget.dart';
 import 'package:flutter/widgets.dart' as w;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:provider/provider.dart';
@@ -44,22 +41,21 @@ class _PDFScreenEduState extends State<PDFScreenEdu> {
   w.Widget build(BuildContext context) {
     ParametersProvider parametersProvider =
         Provider.of<ParametersProvider>(context);
-    AppProvider appProvider = Provider.of<AppProvider>(context);
     pdf = PDFWidgetEdu().createPDF(
-      "Forte Education-18",
-      parametersProvider.lpName,
-      parametersProvider.lpAge,
-      parametersProvider.lpGender,
-      parametersProvider.lpOccupation,
-      parametersProvider.pName,
-      parametersProvider.pAge,
-      parametersProvider.pGender,
-      parametersProvider.pOccupation,
-      parametersProvider.basicSA,
-      parametersProvider.policyTerm,
-      parametersProvider.paymentMode,
-      parametersProvider.annualP,
-    );
+        "Forte Education-18",
+        parametersProvider.lpName,
+        parametersProvider.lpAge,
+        parametersProvider.lpGender,
+        parametersProvider.lpOccupation,
+        parametersProvider.pName,
+        parametersProvider.pAge,
+        parametersProvider.pGender,
+        parametersProvider.pOccupation,
+        parametersProvider.basicSA,
+        parametersProvider.policyTerm,
+        parametersProvider.paymentMode,
+        parametersProvider.annualP,
+        parametersProvider.isOnPolicy);
     return PDFScreenEducationUI(
       pdf: pdf,
     );

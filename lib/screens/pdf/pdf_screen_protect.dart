@@ -44,24 +44,24 @@ class _PDFScreenProtectState extends State<PDFScreenProtect> {
         Provider.of<ParametersProvider>(context);
     AppProvider appProvider = Provider.of<AppProvider>(context);
     pdf = PDFWidget().createPDF(
-      "Forte Protect",
-      appProvider.addRider,
-      appProvider.differentPerson,
-      parametersProvider.lpName,
-      parametersProvider.lpAge,
-      parametersProvider.lpGender,
-      parametersProvider.lpOccupation,
-      parametersProvider.pName,
-      parametersProvider.pAge,
-      parametersProvider.pGender,
-      parametersProvider.pOccupation,
-      parametersProvider.basicSA,
-      parametersProvider.policyTerm,
-      parametersProvider.paymentMode,
-      parametersProvider.annualP,
-      parametersProvider.premiumRider,
-      parametersProvider.riderSA,
-    );
+        "Forte Protect",
+        appProvider.addRider,
+        appProvider.differentPerson,
+        parametersProvider.lpName,
+        parametersProvider.lpAge,
+        parametersProvider.lpGender,
+        parametersProvider.lpOccupation,
+        parametersProvider.pName,
+        parametersProvider.pAge,
+        parametersProvider.pGender,
+        parametersProvider.pOccupation,
+        parametersProvider.basicSA,
+        parametersProvider.policyTerm,
+        parametersProvider.paymentMode,
+        parametersProvider.annualP,
+        parametersProvider.premiumRider,
+        parametersProvider.riderSA,
+        parametersProvider.isOnPolicy);
     return PDFScreenProtectUI(
       pdf: pdf,
     );

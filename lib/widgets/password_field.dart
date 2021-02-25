@@ -23,6 +23,7 @@ class PasswordField extends StatelessWidget {
         child: TextField(
           controller: tec,
           keyboardType: TextInputType.name,
+          obscureText: true,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.all(15),
             border: InputBorder.none,

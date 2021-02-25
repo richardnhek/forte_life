@@ -15,21 +15,22 @@ class CalculatorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(10),
-      width: 140,
-      height: 140,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(5),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black.withOpacity(0.16),
-                spreadRadius: 5,
-                blurRadius: 5)
-          ]),
-      child: GestureDetector(
-        onTap: calculatorOnTap,
+    return GestureDetector(
+      onTap: calculatorOnTap,
+      child: Container(
+        padding: EdgeInsets.all(10),
+        width: 140,
+        height: 140,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.16),
+                  spreadRadius: 0.5,
+                  blurRadius: 10,
+                  offset: Offset(3, 6))
+            ]),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,

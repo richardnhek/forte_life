@@ -113,4 +113,14 @@ class AppProvider extends ChangeNotifier {
   }
   //
 
+  //Get Username
+  String _userName = "Forte Agent";
+  String get userName => _userName;
+
+  set userName(String i) {
+    _userName = i;
+    notifyListeners();
+  }
+  //
+
 }

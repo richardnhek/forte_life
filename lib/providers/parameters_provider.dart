@@ -20,8 +20,8 @@ class ParametersProvider extends ChangeNotifier {
     _pName = i.toUpperCase();
     notifyListeners();
   }
-
   //
+
   // Life Proposed's Age
   String _lpAge = "0";
 
@@ -153,5 +153,14 @@ class ParametersProvider extends ChangeNotifier {
     notifyListeners();
   }
   //
-//
+
+  //Whether The Birthdate is before or after the date the plan is bought
+  bool _isOnPolicy = false;
+  bool get isOnPolicy => _isOnPolicy;
+
+  set isOnPolicy(bool i) {
+    _isOnPolicy = i;
+    notifyListeners();
+  }
+  //
 }

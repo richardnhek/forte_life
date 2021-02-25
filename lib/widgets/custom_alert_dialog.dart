@@ -1,19 +1,25 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CustomAlertDialog extends StatelessWidget {
-  const CustomAlertDialog({
-    this.icon,
-    this.title,
-    this.details,
-    this.actionButtonTitle,
-    this.onActionButtonPressed,
-  });
+  const CustomAlertDialog(
+      {this.icon,
+      this.title,
+      this.details,
+      this.actionButtonTitle,
+      this.actionButtonTitleTwo,
+      this.onActionButtonPressed,
+      this.onActionButtonPressedTwo,
+      this.isPrompt});
 
   final Widget icon;
   final String title;
   final String details;
   final String actionButtonTitle;
+  final String actionButtonTitleTwo;
   final Function onActionButtonPressed;
+  final Function onActionButtonPressedTwo;
+  final bool isPrompt;
 
   @override
   Widget build(BuildContext context) {
@@ -65,17 +71,40 @@ class CustomAlertDialog extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               SizedBox(height: 20),
-              SizedBox(
-                height: 50,
-                child: FlatButton(
-                  color: Color(0xFF8AB84B),
-                  onPressed: onActionButtonPressed,
-                  child: Text(
-                    actionButtonTitle,
-                    style: TextStyle(
-                        fontSize: 16, fontFamily: "Kano", color: Colors.white),
+              Visibility(
+                visible: isPrompt,
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  SizedBox(
+                    height: 50,
+                    child: FlatButton(
+                      color: Color(0xFF8AB84B),
+                      onPressed: onActionButtonPressed,
+                      child: Text(
+                        actionButtonTitle,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: "Kano",
+                            color: Colors.white),
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(width: 10),
+                  SizedBox(
+                    height: 50,
+                    child: FlatButton(
+                      color: Color(0xFFD31145),
+                      onPressed: onActionButtonPressedTwo,
+                      child: Text(
+                        actionButtonTitleTwo,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: "Kano",
+                            color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ]),
               ),
             ],
           ),
