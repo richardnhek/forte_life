@@ -88,7 +88,7 @@ class _PDFScreenProtectUIState extends State<PDFScreenProtectUI> {
             onPressed: () async {
               if (fileName.text.isNotEmpty) {
                 File newFile = new File(
-                    "/storage/emulated/0/Android/data/com.reahu.forte_life/files/protect/${fileName.text}.pdf");
+                    "/storage/emulated/0/Download/ForteLife/protect/${fileName.text}.pdf");
                 if (await newFile.exists()) {
                   print("File Already Exists");
                 } else {

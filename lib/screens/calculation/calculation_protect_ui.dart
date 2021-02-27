@@ -762,9 +762,9 @@ class _CalculationProtectUIState extends State<CalculationProtectUI> {
 
                             riderAdded.clear();
 
-                            lSelectedGender = null;
-                            pSelectedGender = null;
-                            selectedYear = 0;
+                            lSelectedGender = "Male";
+                            pSelectedGender = "Male";
+                            selectedYear = 10;
                           },
                         ))
                   ],

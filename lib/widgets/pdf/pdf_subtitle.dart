@@ -10,6 +10,6 @@ class PDFSubtitle extends StatelessWidget {
     return Container(
         width: 90,
         child: Center(
-            child: Text(title, style: TextStyle(fontSize: 7, font: font))));
+            child: Text(title, style: TextStyle(fontSize: 8.25, font: font))));
   }
 }

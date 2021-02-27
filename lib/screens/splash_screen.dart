@@ -54,10 +54,11 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> determineInitialRoute() async {
-    Navigator.pushNamed(context, "/login");
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    //TODO if the user is offline for 1 full day: remove token
     // prefs.remove(APP_ACCESS_TOKEN);
+    //
     String accessToken = prefs.getString(APP_ACCESS_TOKEN) ?? '';
 
     if (accessToken.isEmpty) {
@@ -72,6 +73,12 @@ class _SplashScreenState extends State<SplashScreen>
       }
     }
   }
+
+  //TODO check if the user is offline for 1 full day
+  // Future<DateTime> getOfflineDateTime() async {
+  //
+  // }
+  //
 
   Future<void> getImageFileFromAssets(String path) async {
     final byteData = await rootBundle.load(path);
@@ -100,11 +107,15 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> createPDFDir() async {
     final protectFolder = "protect";
     final educationFolder = "education";
-
-    final pathProtect = Directory(
-        "/storage/emulated/0/Android/data/com.reahu.forte_life/files/$protectFolder");
-    final pathEducation = Directory(
-        "/storage/emulated/0/Android/data/com.reahu.forte_life/files/$educationFolder");
+    final pathForte = Directory("/storage/emulated/0/Download/ForteLife");
+    final pathProtect =
+        Directory("/storage/emulated/0/Download/ForteLife/$protectFolder");
+    final pathEducation =
+        Directory("/storage/emulated/0/Download/ForteLife/$educationFolder");
+    if (await pathForte.exists()) {
+      print("Forte Folder Already Created");
+    } else
+      pathForte.create();
     if (await pathProtect.exists()) {
       print("Protect Folder Already Created");
     } else

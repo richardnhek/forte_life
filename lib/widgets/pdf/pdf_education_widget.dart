@@ -7,20 +7,21 @@ import 'dart:io';
 
 class PDFWidgetEdu {
   Document createPDF(
-      String title,
-      String lpName,
-      String lpAge,
-      String lpGender,
-      String lpOccupation,
-      String pName,
-      String pAge,
-      String pGender,
-      String pOccupation,
-      String basicSA,
-      String policyTerm,
-      String paymentMode,
-      String premium,
-      bool isOnPolicy) {
+    String title,
+    String lpName,
+    String lpAge,
+    String lpGender,
+    String lpOccupation,
+    String pName,
+    String pAge,
+    String pGender,
+    String pOccupation,
+    String basicSA,
+    String policyTerm,
+    String paymentMode,
+    String premium,
+    bool isOnPolicy,
+  ) {
     //Final variables
     final file = File(
             "/storage/emulated/0/Android/data/com.reahu.forte_life/files/logo.png")
@@ -29,6 +30,7 @@ class PDFWidgetEdu {
     final Uint8List regularFont = File(
             '/storage/emulated/0/Android/data/com.reahu.forte_life/files/LiberationSans-Regular.ttf')
         .readAsBytesSync();
+
     final Uint8List boldFont = File(
             '/storage/emulated/0/Android/data/com.reahu.forte_life/files/LiberationSans-Bold.ttf')
         .readAsBytesSync();
@@ -58,12 +60,13 @@ class PDFWidgetEdu {
     //
 
     // Round all the doubles to a .00 decimal format
-    String halfP = (premiumNum * 0.5178).toStringAsFixed(2);
-    String quarterlyP = (premiumNum * 0.2635).toStringAsFixed(2);
-    String monthlyP = (premiumNum * 0.0888).toStringAsFixed(2);
-    double halfPNum = double.parse(halfP);
-    double quarterlyPNum = double.parse(quarterlyP);
-    double monthlyPNum = double.parse(monthlyP);
+
+    double halfPNum = premiumNum * 0.5178;
+    double quarterlyPNum = premiumNum * 0.2635;
+    double monthlyPNum = premiumNum * 0.0888;
+    String halfP = halfPNum.toStringAsFixed(2);
+    String quarterlyP = quarterlyPNum.toStringAsFixed(2);
+    String monthlyP = monthlyPNum.toStringAsFixed(2);
     String cashValueStr = cashValue.toStringAsFixed(2);
     //
 

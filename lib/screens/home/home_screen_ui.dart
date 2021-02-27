@@ -2,6 +2,7 @@ import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:forte_life/providers/app_provider.dart';
 import 'package:forte_life/widgets/calculator_button.dart';
+import 'package:forte_life/widgets/field_title.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreenUI extends StatelessWidget {
@@ -27,41 +28,36 @@ class HomeScreenUI extends StatelessWidget {
                           "assets/pictures/android/gradient3_test.png"),
                       fit: BoxFit.fill)),
             ),
-            Padding(
-              padding: EdgeInsets.all(15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: mq.size.height / 8, left: 15),
-                    child: Container(
-                      width: 180,
-                      height: 35,
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage(
-                                  "assets/pictures/android/logo/logo.png"),
-                              fit: BoxFit.contain)),
-                    ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: mq.size.height / 8, left: 25),
+                  child: Container(
+                    width: 200,
+                    height: 50,
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage(
+                                "assets/pictures/android/logo/logo.png"),
+                            fit: BoxFit.contain)),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                      top: mq.size.height / 6,
-                    ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: mq.size.height / 6,
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 15),
-                          child: Text(
-                            "Insurance Calculator",
-                            style: TextStyle(
-                                fontFamily: "Kano",
-                                fontSize: 21,
-                                color: Color(0xFF4D4D4D),
-                                fontWeight: FontWeight.w600),
+                          padding: EdgeInsets.only(left: 15),
+                          child: FieldTitle(
+                            fieldTitle: "Insurance Calculator",
                           ),
                         ),
                         SizedBox(height: 25),
@@ -88,13 +84,32 @@ class HomeScreenUI extends StatelessWidget {
                           ],
                         ),
                         SizedBox(
-                          height: 25,
+                          height: 50,
                         ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 15),
+                          child: FieldTitle(
+                            fieldTitle: "Forte Life Videos",
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: mq.size.height / 15),
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Text(
+                              "Coming Soon",
+                              style: TextStyle(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  fontSize: 15,
+                                  fontFamily: "Kano"),
+                            ),
+                          ),
+                        )
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),

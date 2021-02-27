@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:forte_life/utils/device_utils.dart';
+
 import 'package:forte_life/widgets/username_field.dart';
 import 'package:provider/provider.dart';
 import 'package:forte_life/providers/app_provider.dart';
@@ -24,7 +24,6 @@ class LoginScreenUI extends StatelessWidget {
     final mq = MediaQuery.of(context);
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,26 +56,20 @@ class LoginScreenUI extends StatelessWidget {
                   ),
                   constraints: BoxConstraints(maxWidth: 300, maxHeight: 52),
                 ),
-                SizedBox(
-                  height: DeviceUtils.getResponsive(
-                      appProvider: appProvider,
-                      mq: mq,
-                      onPhone: 50.0,
-                      onTablet: 50.0),
-                ),
+                SizedBox(height: 50),
                 UserNameField(
                   hintText: "Username",
                   tec: usernameController,
                 ),
                 SizedBox(
-                  height: 16,
+                  height: 15,
                 ),
                 PasswordField(
                   hintText: "Password",
                   tec: passwordController,
                 ),
                 SizedBox(
-                  height: 32,
+                  height: 30,
                 ),
                 Container(
                   width: 100,
@@ -87,13 +80,17 @@ class LoginScreenUI extends StatelessWidget {
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
                           colors: [Color(0xFF6ABFBC), Color(0xFF8AB84B)])),
-                  child: FlatButton(
+                  child: RaisedButton(
                     padding: EdgeInsets.all(10),
+                    elevation: 2.5,
+                    disabledElevation: 2.5,
+                    disabledColor: Color(0xFF8AB84B),
+                    color: Color(0xFF8AB84B),
                     onPressed: () => onSignInPress(context),
                     child: Text(
                       "Login",
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 17.5,
                           fontFamily: "Kano",
                           fontWeight: FontWeight.w600,
                           color: Colors.white),

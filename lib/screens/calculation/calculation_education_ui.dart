@@ -569,9 +569,9 @@ class _CalculationEducationUIState extends State<CalculationEducationUI> {
 
                             riderAdded.clear();
 
-                            lSelectedGender = null;
-                            pSelectedGender = null;
-                            policyYear.text = null;
+                            lSelectedGender = "Male";
+                            pSelectedGender = "Male";
+                            policyYear.text = "10";
                           },
                         ))
                   ],

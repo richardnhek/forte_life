@@ -67,6 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.of(context).popUntil((route) => route.isFirst);
         Navigator.of(context).pushReplacementNamed('/main_flow');
         prefs.setString(AGENT_USERNAME, agent.username);
+        prefs.setString(AGENT_ID, agent.id);
       } catch (error) {
         Navigator.of(loadingModalContext).pop();
         _showErrorDialog(error.message);

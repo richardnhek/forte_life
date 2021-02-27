@@ -104,6 +104,7 @@ class _CalculationEducationState extends State<CalculationEducation> {
             dy: mq.size.height / 13.5,
             dx: mq.size.width / 20,
             child: FloatingActionButton(
+              heroTag: "backBtn",
               backgroundColor: Colors.transparent,
               elevation: 0,
               child: Icon(

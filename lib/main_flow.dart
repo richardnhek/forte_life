@@ -49,32 +49,49 @@ class _MainFlowState extends State<MainFlow> {
                 colors: [Color(0xFF92C04A), Color(0xFF6ABFBC)])),
         height: 60.0,
         width: double.infinity,
-        child: BottomNavigationBar(
-          backgroundColor: Colors.transparent,
-          type: BottomNavigationBarType.fixed,
-          showUnselectedLabels: false,
-          onTap: onTappedBar,
-          elevation: 0,
-          currentIndex: appProvider.activeTabIndex,
-          showSelectedLabels: false,
-          unselectedItemColor: Colors.white,
-          selectedItemColor: Colors.white,
-          iconSize: 25.0,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              label: 'Home',
+        child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+          final tabWidth = constraints.maxWidth / 3;
+          return Stack(children: [
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOutQuad,
+              left: tabWidth * appProvider.activeTabIndex,
+              bottom: 0,
+              child: Container(
+                height: 3.5,
+                width: tabWidth,
+                color: Colors.white,
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.article_outlined),
-              label: 'Information',
+            BottomNavigationBar(
+              backgroundColor: Colors.transparent,
+              type: BottomNavigationBarType.fixed,
+              showUnselectedLabels: false,
+              onTap: onTappedBar,
+              elevation: 0,
+              currentIndex: appProvider.activeTabIndex,
+              showSelectedLabels: false,
+              unselectedItemColor: Colors.white,
+              selectedItemColor: Colors.white,
+              iconSize: 25.0,
+              items: [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home_outlined),
+                  label: 'Home',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.article_outlined),
+                  label: 'Information',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person_outline_rounded),
+                  label: "Profile",
+                ),
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline_rounded),
-              label: "Profile",
-            ),
-          ],
-        ),
+          ]);
+        }),
       ),
     );
   }
