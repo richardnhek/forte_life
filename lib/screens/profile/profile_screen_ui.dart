@@ -2,7 +2,9 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:forte_life/providers/app_provider.dart';
 import 'package:forte_life/widgets/custom_alert_dialog.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreenUI extends StatelessWidget {
   ProfileScreenUI(
@@ -18,7 +20,7 @@ class ProfileScreenUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
-
+    final appProvider = Provider.of<AppProvider>(context);
     void _showExitDialog() {
       showDialog(
           context: context,
@@ -225,6 +227,7 @@ class ProfileScreenUI extends StatelessWidget {
     }
 
     void _showContactDialog() {
+      print(appProvider.userName);
       showDialog(
           context: context,
           builder: (ctx) => Material(
@@ -394,7 +397,7 @@ class ProfileScreenUI extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        "Username: forte",
+                        "Username: ${appProvider.userName}",
                         style: TextStyle(
                             color: Colors.grey,
                             fontSize: 15,

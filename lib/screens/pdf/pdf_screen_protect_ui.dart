@@ -125,14 +125,14 @@ class _PDFScreenProtectUIState extends State<PDFScreenProtectUI> {
                 : SafeArea(
                     child: SfPdfViewer.file(
                       file,
-                      initialZoomLevel: 1.2,
+                      initialZoomLevel: 1,
                       pageSpacing: 0,
                     ),
                   )),
       ),
       AlignPositioned(
         alignment: Alignment.bottomRight,
-        moveVerticallyByContainerWidth: -0.25,
+        moveVerticallyByContainerWidth: -0.1,
         moveHorizontallyByChildHeight: -0.25,
         child: FloatingActionButton(
           child: Icon(

@@ -41,11 +41,11 @@ class PDFWidget {
     final regularF = Font.ttf(regularData);
     final boldF = Font.ttf(boldData);
     final Map<int, TableColumnWidth> columnWidthVal = {
-      0: FlexColumnWidth(0.6),
-      1: FlexColumnWidth(1.9),
-      2: FlexColumnWidth(1.9),
-      3: FlexColumnWidth(0.9),
-      4: FlexColumnWidth(2.2)
+      0: FlexColumnWidth(0.45),
+      1: FlexColumnWidth(1.85),
+      2: FlexColumnWidth(1.85),
+      3: FlexColumnWidth(0.7),
+      4: FlexColumnWidth(2.65)
     };
 
     //Doubles with no previous values
@@ -138,7 +138,7 @@ class PDFWidget {
             dynamicRow = [
               [
                 "$i",
-                "${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}",
+                "${totalPremiumNum.toStringAsFixed(2)}            ${accumulatedPremium.toStringAsFixed(2)}",
                 "${allCauses.toStringAsFixed(2)}            ${allAccidents.toStringAsFixed(2)}",
                 "-",
                 "          -                              -                             -         "
@@ -151,7 +151,7 @@ class PDFWidget {
             accumulatedPremium += totalPremiumNum;
             dynamicRow.add([
               "$i",
-              "${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}",
+              "${totalPremiumNum.toStringAsFixed(2)}            ${accumulatedPremium.toStringAsFixed(2)}",
               "${allCauses.toStringAsFixed(2)}            ${allAccidents.toStringAsFixed(2)}",
               "-",
               "          -                              -                             -         "
@@ -167,7 +167,7 @@ class PDFWidget {
             dynamicRow = [
               [
                 "$i",
-                "${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}",
+                "${totalPremiumNum.toStringAsFixed(2)}            ${accumulatedPremium.toStringAsFixed(2)}",
                 "${allCauses.toStringAsFixed(2)}            ${allAccidents.toStringAsFixed(2)}",
                 "-",
                 "          -                              -                             -         "
@@ -180,7 +180,7 @@ class PDFWidget {
             accumulatedPremium += totalPremiumNum;
             dynamicRow.add([
               "$i",
-              "${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}",
+              "${totalPremiumNum.toStringAsFixed(2)}            ${accumulatedPremium.toStringAsFixed(2)}",
               "${allCauses.toStringAsFixed(2)}            ${allAccidents.toStringAsFixed(2)}",
               "-",
               "          -                              -                             -         "
@@ -197,7 +197,7 @@ class PDFWidget {
             dynamicRow = [
               [
                 "$i",
-                "${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}",
+                "${totalPremiumNum.toStringAsFixed(2)}            ${accumulatedPremium.toStringAsFixed(2)}",
                 "${allCauses.toStringAsFixed(2)}            ${allAccidents.toStringAsFixed(2)}",
                 "-",
                 "          -                              -                             -         "
@@ -215,7 +215,7 @@ class PDFWidget {
             dynamicRow = [
               [
                 "$i",
-                "${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}",
+                "${totalPremiumNum.toStringAsFixed(2)}            ${accumulatedPremium.toStringAsFixed(2)}",
                 "${allCauses.toStringAsFixed(2)}            ${allAccidents.toStringAsFixed(2)}",
                 "-",
                 "          -                              -                             -         "
@@ -248,19 +248,19 @@ class PDFWidget {
         if (i < policyYear) {
           dynamicRow.add([
             "$i",
-            "${totalPremiumNum.toStringAsFixed(2)}\t${accumulatedPremium.toStringAsFixed(2)}",
+            "${totalPremiumNum.toStringAsFixed(2)}            ${accumulatedPremium.toStringAsFixed(2)}",
             "${allCauses.toStringAsFixed(2)}            ${allAccidents.toStringAsFixed(2)}",
             cashValueStr,
-            "     -                                    -                                  -     "
+            "          -                              -                             -         "
           ]);
           i++;
         } else {
           dynamicRow.add([
             "$i",
-            "${totalPremiumNum.toStringAsFixed(2)}              ${accumulatedPremium.toStringAsFixed(2)}",
+            "${totalPremiumNum.toStringAsFixed(2)}            ${accumulatedPremium.toStringAsFixed(2)}",
             "${allCauses.toStringAsFixed(2)}            ${allAccidents.toStringAsFixed(2)}",
             cashValue.toStringAsFixed(2),
-            "${basicSANum.toStringAsFixed(2)}                        ${getGSB()}                           ${basicSANum + getGSB()}"
+            "${basicSANum.toStringAsFixed(2)}           ${getGSB()}           ${basicSANum + getGSB()}"
           ]);
           i++;
         }
@@ -272,16 +272,19 @@ class PDFWidget {
     List<String> getDynamicHeaders() {
       List<String> dynamicHeader = [
         "End of Policy Year",
-        "Premium (USD)\n\nAnnualized Accumulated",
-        "Death/TPD (USD)\nAll Causes    Accidents",
-        "Cash\nValue",
-        "Guaranteed Guaranteed Total Maturity"
+        "                 Premium (USD)\n\n       Annualized       Accumulated",
+        "               Death/TPD (USD)\n\n       All Causes          Accidents",
+        "        Cash\n        Value",
+        "   Guaranteed         Guaranteed     Total Maturity" +
+            "\n" +
+            " Maturity Benefit   Special Benefit     Benefit"
       ];
       return dynamicHeader;
     }
 
     Document pdf = Document();
     pdf.addPage(Page(
+        margin: EdgeInsets.symmetric(vertical: 7.5, horizontal: 20),
         pageFormat: PdfPageFormat.a4,
         build: (Context context) {
           return Container(
@@ -329,23 +332,25 @@ class PDFWidget {
                           TableCellVerticalAlignment.middle,
                       children: [
                         TableRow(children: [
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 5, bottom: 2.5, top: 2.5),
-                                  child: Container(width: 100),
-                                ),
-                                PDFSubtitle(title: "Name", font: boldF),
-                                PDFSubtitle(title: "Age", font: boldF),
-                                PDFSubtitle(title: "Gender", font: boldF),
-                                Padding(
-                                  padding: EdgeInsets.only(right: 5),
-                                  child: PDFSubtitle(
-                                      title: "Occupation", font: boldF),
-                                )
-                              ])
+                          Padding(
+                              padding: EdgeInsets.symmetric(vertical: 2.5),
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 5),
+                                      child: Container(width: 100),
+                                    ),
+                                    PDFSubtitle(title: "Name", font: boldF),
+                                    PDFSubtitle(title: "Age", font: boldF),
+                                    PDFSubtitle(title: "Gender", font: boldF),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 5),
+                                      child: PDFSubtitle(
+                                          title: "Occupation", font: boldF),
+                                    )
+                                  ]))
                         ]),
                         TableRow(children: [
                           Column(children: [
@@ -433,29 +438,28 @@ class PDFWidget {
                                         Padding(
                                             padding: EdgeInsets.only(
                                                 left: 5, bottom: 2.5, top: 2.5),
-                                            child: Container(
+                                            child: SizedBox(
                                                 width: 103.55,
                                                 child: Text(
                                                     "Basic Plan     : $title",
                                                     style: TextStyle(
                                                         font: regularF,
                                                         fontSize: 8.25)))),
-                                        PDFSubtitle(
-                                            title:
-                                                "USD ${basicSANum.toStringAsFixed(2)}",
-                                            font: regularF),
+                                        SizedBox(
+                                            width: 125,
+                                            child: PDFSubtitle(
+                                                title:
+                                                    "USD ${basicSANum.toStringAsFixed(2)}",
+                                                font: regularF)),
                                         Padding(
-                                          padding: EdgeInsets.only(left: 2.5),
+                                          padding: EdgeInsets.only(left: 3.5),
                                           child: PDFSubtitle(
                                               title: policyTerm,
                                               font: regularF),
                                         ),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 2.5),
-                                          child: PDFSubtitle(
-                                              title: policyTerm,
-                                              font: regularF),
-                                        )
+                                        SizedBox(width: 22.5),
+                                        PDFSubtitle(
+                                            title: policyTerm, font: regularF)
                                       ]),
                                   addRider == true
                                       ? Row(
@@ -592,28 +596,33 @@ class PDFWidget {
                           TableCellVerticalAlignment.middle,
                       children: [
                         TableRow(children: [
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(children: [
-                                  PDFSubtitle(title: "Yearly", font: regularF),
-                                  PDFSubtitle(title: "USD $totalPremiumStr")
-                                ]),
-                                Column(children: [
-                                  PDFSubtitle(
-                                      title: "Half-yearly", font: regularF),
-                                  PDFSubtitle(title: "USD $halfP")
-                                ]),
-                                Column(children: [
-                                  PDFSubtitle(
-                                      title: "Quarterly", font: regularF),
-                                  PDFSubtitle(title: "USD $quarterlyP")
-                                ]),
-                                Column(children: [
-                                  PDFSubtitle(title: "Monthly", font: regularF),
-                                  PDFSubtitle(title: "USD $monthlyP")
-                                ])
-                              ])
+                          Padding(
+                              padding: EdgeInsets.symmetric(vertical: 2.5),
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(children: [
+                                      PDFSubtitle(
+                                          title: "Yearly", font: regularF),
+                                      PDFSubtitle(title: "USD $totalPremiumStr")
+                                    ]),
+                                    Column(children: [
+                                      PDFSubtitle(
+                                          title: "Half-yearly", font: regularF),
+                                      PDFSubtitle(title: "USD $halfP")
+                                    ]),
+                                    Column(children: [
+                                      PDFSubtitle(
+                                          title: "Quarterly", font: regularF),
+                                      PDFSubtitle(title: "USD $quarterlyP")
+                                    ]),
+                                    Column(children: [
+                                      PDFSubtitle(
+                                          title: "Monthly", font: regularF),
+                                      PDFSubtitle(title: "USD $monthlyP")
+                                    ])
+                                  ]))
                         ])
                       ]),
                   SizedBox(height: 15),
@@ -621,15 +630,17 @@ class PDFWidget {
                       headers: getDynamicHeaders(),
                       columnWidths: columnWidthVal,
                       headerAlignment: Alignment.center,
+                      cellPadding: EdgeInsets.only(
+                          top: 3.5, right: 2.5, left: 2.5, bottom: 1.5),
                       headerHeight: 20,
-                      headerPadding: const EdgeInsets.symmetric(
-                          horizontal: 2.5, vertical: 3.5),
-                      cellPadding: const EdgeInsets.symmetric(horizontal: 2.5),
+                      cellHeight: 1.5,
+                      headerPadding: const EdgeInsets.only(
+                          right: 1.5, bottom: 1.5, left: 1.5, top: 1.5),
                       headerDecoration:
-                          BoxDecoration(border: BoxBorder(bottom: true)),
+                          BoxDecoration(border: Border(bottom: BorderSide())),
                       headerStyle: TextStyle(font: boldF, fontSize: 8.25),
-                      cellStyle: TextStyle(font: regularF, fontSize: 7.85),
-                      cellAlignment: Alignment.center,
+                      cellStyle: TextStyle(font: regularF, fontSize: 7.6),
+                      cellAlignment: Alignment.topCenter,
                       border: TableBorder.ex(
                           verticalInside: BorderSide(),
                           top: BorderSide(),

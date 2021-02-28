@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:forte_life/widgets/username_field.dart';
-import 'package:provider/provider.dart';
-import 'package:forte_life/providers/app_provider.dart';
 import 'package:forte_life/widgets/password_field.dart';
 
 class LoginScreenUI extends StatelessWidget {
@@ -20,24 +18,17 @@ class LoginScreenUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppProvider appProvider = Provider.of<AppProvider>(context, listen: false);
     final mq = MediaQuery.of(context);
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Container(
-              width: double.infinity,
-              height: mq.size.height / 4,
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image:
-                          AssetImage("assets/pictures/android/gradient1.png"),
-                      fit: BoxFit.fill)),
-            ),
+            child: Image(
+                fit: BoxFit.fill,
+                image: AssetImage("assets/pictures/android/gradient1.png"),
+                gaplessPlayback: true),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: mq.size.width / 8),
@@ -101,15 +92,11 @@ class LoginScreenUI extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Container(
-              width: double.infinity,
-              height: mq.size.height / 4,
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image:
-                          AssetImage("assets/pictures/android/gradient2.png"),
-                      fit: BoxFit.fill)),
-            ),
+            child: Image(
+                width: double.infinity,
+                fit: BoxFit.fill,
+                image: AssetImage("assets/pictures/android/gradient2.png"),
+                gaplessPlayback: true),
           ),
         ],
       ),

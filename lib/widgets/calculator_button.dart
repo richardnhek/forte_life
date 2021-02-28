@@ -15,12 +15,18 @@ class CalculatorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: calculatorOnTap,
+    return RaisedButton(
+      onPressed: calculatorOnTap,
+      disabledColor: Colors.transparent,
+      color: Colors.transparent,
+      highlightColor: Colors.transparent,
+      elevation: 3.5,
+      highlightElevation: 15,
+      padding: EdgeInsets.zero,
       child: Container(
         padding: EdgeInsets.all(10),
-        width: 140,
         height: 140,
+        width: 140,
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(5),

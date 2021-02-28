@@ -18,6 +18,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    getUsername();
+  }
+
+  Future<void> getUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    final appProvider = Provider.of<AppProvider>(context, listen: false);
+    appProvider.userName = prefs.getString(AGENT_USERNAME);
+    print(appProvider.userName);
   }
 
   @override

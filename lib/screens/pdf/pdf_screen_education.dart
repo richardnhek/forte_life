@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:forte_life/providers/parameters_provider.dart';
 import 'package:forte_life/screens/pdf/pdf_screen_education_ui.dart';
 import 'package:forte_life/widgets/pdf/pdf_education_widget.dart';

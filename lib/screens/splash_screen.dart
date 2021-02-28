@@ -60,9 +60,14 @@ class _SplashScreenState extends State<SplashScreen>
     // prefs.remove(APP_ACCESS_TOKEN);
     //
     String accessToken = prefs.getString(APP_ACCESS_TOKEN) ?? '';
+    // bool isFirstTime = prefs.getBool('first_time');
 
     if (accessToken.isEmpty) {
-      Navigator.of(context).pushReplacementNamed("/login");
+      Future.delayed(Duration(milliseconds: 500));
+      // if(isFirstTime == true) {
+      //   Navigator.of(context).pushReplacementNamed('/login');
+      // }
+      Navigator.of(context).pushReplacementNamed('/login');
     } else {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       try {
@@ -73,6 +78,18 @@ class _SplashScreenState extends State<SplashScreen>
       }
     }
   }
+
+  // Future<bool> isFirstTime() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   var isFirstTime = prefs.getBool('first_time');
+  //   if (isFirstTime != null && !isFirstTime) {
+  //     prefs.setBool('first_time', false);
+  //     return false;
+  //   } else {
+  //     prefs.setBool('first_time', false);
+  //     return true;
+  //   }
+  // }
 
   //TODO check if the user is offline for 1 full day
   // Future<DateTime> getOfflineDateTime() async {
@@ -130,6 +147,7 @@ class _SplashScreenState extends State<SplashScreen>
     AppProvider appProvider = Provider.of(context, listen: false);
     appProvider.setAppOrientation();
     await Future.delayed(const Duration(milliseconds: 4600));
+    // await isFirstTime();
     await appProvider.requestPermissions();
     await getExternalStorageDirectory();
     await getImageFileFromAssets("assets/pictures/android/logo/logo.png");
